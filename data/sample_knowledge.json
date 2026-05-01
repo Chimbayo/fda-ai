@@ -1,0 +1,272 @@
+{
+  "crops": [
+    {
+      "name": "Maize",
+      "description": "Staple food crop in Malawi, accounts for over 60% of calorie intake",
+      "type": "Cereal",
+      "varieties": [
+        {
+          "name": "SC 301 (Kalulu)",
+          "maturity": "Ultra-early (90-100 days)",
+          "yield": "3-4 tons/ha",
+          "characteristics": "Drought tolerant, compact plant, excellent standability, good for low rainfall areas",
+          "regions": ["Southern Region", "Central Region"]
+        },
+        {
+          "name": "SC 303 (Kalulu)",
+          "maturity": "Ultra-early (90-100 days)",
+          "yield": "3-4 tons/ha",
+          "characteristics": "Compact plant type, excellent standability, good husk cover",
+          "regions": ["All regions"]
+        },
+        {
+          "name": "SC 403 (Kanyani)",
+          "maturity": "Early (100-110 days)",
+          "yield": "4-5 tons/ha",
+          "characteristics": "High yielding under good management, good disease tolerance",
+          "regions": ["Central Region", "Northern Region"]
+        },
+        {
+          "name": "SC 419 (Kanyani)",
+          "maturity": "Early (100-110 days)",
+          "yield": "4-6 tons/ha",
+          "characteristics": "Excellent yield stability, good adaptation to various conditions",
+          "regions": ["All regions"]
+        },
+        {
+          "name": "SC 423 (Kanyani)",
+          "maturity": "Early (100-110 days)",
+          "yield": "4-5 tons/ha",
+          "characteristics": "Good emergence, vigorous early growth, stable yielder",
+          "regions": ["Central Region"]
+        },
+        {
+          "name": "SC 529 (Mbidzi)",
+          "maturity": "Medium (110-120 days)",
+          "yield": "5-7 tons/ha",
+          "characteristics": "Good tolerance to major diseases, strong stalks, good husk cover",
+          "regions": ["Central Region", "Northern Region"]
+        },
+        {
+          "name": "SC 537 (Mbidzi)",
+          "maturity": "Medium (110-120 days)",
+          "yield": "5-7 tons/ha",
+          "characteristics": "Excellent disease tolerance, good standability, broad adaptation",
+          "regions": ["All regions"]
+        },
+        {
+          "name": "SC 627 (Mkango)",
+          "maturity": "Medium-late (120-130 days)",
+          "yield": "6-8 tons/ha",
+          "characteristics": "Very high yielder under optimal conditions, requires good management",
+          "regions": ["High potential areas", "Central Region"]
+        },
+        {
+          "name": "SC 653 (Mkango)",
+          "maturity": "Medium-late (120-130 days)",
+          "yield": "6-8 tons/ha",
+          "characteristics": "Very high yield potential, good husk cover, excellent tip filling",
+          "regions": ["High potential areas"]
+        },
+        {
+          "name": "SC 719 (Njobvu)",
+          "maturity": "Medium-late (120-130 days)",
+          "yield": "6-8 tons/ha",
+          "characteristics": "Excellent husk cover, good tip filling, strong stalks, high shelling percentage",
+          "regions": ["All regions with good rainfall"]
+        }
+      ]
+    },
+    {
+      "name": "Tomato",
+      "description": "Important vegetable crop for nutrition and income",
+      "type": "Vegetable",
+      "varieties": [
+        {
+          "name": "Roma VF",
+          "maturity": "75-85 days",
+          "yield": "20-30 tons/ha",
+          "characteristics": "Determinate, good for processing, disease resistant",
+          "regions": ["All regions"]
+        },
+        {
+          "name": "Money Maker",
+          "maturity": "80-90 days",
+          "yield": "25-35 tons/ha",
+          "characteristics": "Indeterminate, good for fresh market, long harvesting period",
+          "regions": ["Highlands"]
+        }
+      ]
+    }
+  ],
+  "diseases": [
+    {
+      "name": "Maize Leaf Blight",
+      "description": "Fungal disease caused by Exserohilum turcicum, causes significant yield loss if not controlled",
+      "symptoms": "Long elliptical brown lesions on leaves starting from tips, tan centers with dark borders, may have yellow halos",
+      "affected_crops": ["Maize"],
+      "severity": "high",
+      "favorable_conditions": "High humidity, moderate temperatures (18-27°C), wet weather",
+      "treatments": [
+        {
+          "name": "Fungicide Application",
+          "type": "Chemical",
+          "application": "Apply fungicide at first sign of disease, repeat every 14 days during wet weather. Use Mancozeb or Azoxystrobin-based products.",
+          "effectiveness": "High",
+          "cost_level": "Medium"
+        },
+        {
+          "name": "Resistant Varieties",
+          "type": "Preventive",
+          "application": "Plant resistant varieties like SC 529, SC 653 which have good disease tolerance",
+          "effectiveness": "High",
+          "cost_level": "Low"
+        },
+        {
+          "name": "Crop Rotation",
+          "type": "Cultural",
+          "application": "Rotate with non-host crops like legumes (beans, groundnuts) for at least 2 years",
+          "effectiveness": "Medium",
+          "cost_level": "Low"
+        },
+        {
+          "name": "Field Sanitation",
+          "type": "Cultural",
+          "application": "Remove and destroy crop residues after harvest, practice proper spacing for air circulation",
+          "effectiveness": "Medium",
+          "cost_level": "Low"
+        }
+      ]
+    },
+    {
+      "name": "Tomato Early Blight",
+      "description": "Fungal disease caused by Alternaria solani, affects leaves, stems and fruits",
+      "symptoms": "Dark brown to black spots with concentric rings (target-like appearance), starting on older leaves, yellowing of surrounding tissue",
+      "affected_crops": ["Tomato", "Potato"],
+      "severity": "medium",
+      "favorable_conditions": "Warm temperatures (24-29°C), high humidity, plant stress",
+      "treatments": [
+        {
+          "name": "Remove Infected Leaves",
+          "type": "Cultural",
+          "application": "Remove and destroy infected plant parts immediately, sanitize tools between plants",
+          "effectiveness": "Medium",
+          "cost_level": "Low"
+        },
+        {
+          "name": "Copper-based Fungicide",
+          "type": "Chemical",
+          "application": "Apply preventively or at first symptoms. Use copper oxychloride or copper hydroxide products.",
+          "effectiveness": "High",
+          "cost_level": "Medium"
+        },
+        {
+          "name": "Mulching",
+          "type": "Cultural",
+          "application": "Apply mulch to prevent soil splash which spreads the fungus to lower leaves",
+          "effectiveness": "Medium",
+          "cost_level": "Low"
+        },
+        {
+          "name": "Proper Spacing",
+          "type": "Cultural",
+          "application": "Ensure adequate plant spacing (60-75cm between plants) for good air circulation",
+          "effectiveness": "Medium",
+          "cost_level": "Low"
+        }
+      ]
+    },
+    {
+      "name": "Maize Streak Virus",
+      "description": "Viral disease transmitted by leafhoppers, causes significant yield reduction",
+      "symptoms": "Yellow streaks along leaf veins, starting from base, stunted growth, reduced cob size",
+      "affected_crops": ["Maize"],
+      "severity": "high",
+      "favorable_conditions": "Presence of leafhopper vectors, dry conditions favor vector population",
+      "treatments": [
+        {
+          "name": "Resistant Varieties",
+          "type": "Preventive",
+          "application": "Plant resistant varieties. Most modern hybrids have good resistance.",
+          "effectiveness": "High",
+          "cost_level": "Low"
+        },
+        {
+          "name": "Early Planting",
+          "type": "Cultural",
+          "application": "Plant early in the season to avoid peak vector populations",
+          "effectiveness": "Medium",
+          "cost_level": "Low"
+        },
+        {
+          "name": "Rogue Infected Plants",
+          "type": "Cultural",
+          "application": "Remove and destroy infected plants immediately to prevent spread",
+          "effectiveness": "Medium",
+          "cost_level": "Low"
+        }
+      ]
+    }
+  ],
+  "techniques": [
+    {
+      "name": "Integrated Soil Fertility Management",
+      "description": "Combines organic and inorganic fertilizers for sustainable soil health",
+      "applies_to": ["All crops"],
+      "steps": [
+        "Apply compost or manure before planting (5-10 tons/ha)",
+        "Use basal fertilizer (NPK) at planting",
+        "Apply top dressing fertilizer when plants are knee-high",
+        "Practice crop rotation with legumes",
+        "Leave crop residues in the field"
+      ],
+      "benefits": [
+        "Improved soil structure",
+        "Better water retention",
+        "Higher yields",
+        "Reduced fertilizer costs long-term",
+        "Sustainable production"
+      ]
+    },
+    {
+      "name": "Conservation Agriculture",
+      "description": "Minimum soil disturbance, permanent soil cover, and crop rotation",
+      "applies_to": ["All crops"],
+      "principles": [
+        "Minimal soil disturbance (no plowing)",
+        "Maintain permanent soil cover with mulch",
+        "Diversify crops through rotation",
+        "Integrate livestock where possible"
+      ],
+      "benefits": [
+        "Reduced soil erosion",
+        "Improved water infiltration",
+        "Increased soil organic matter",
+        "Lower labor requirements",
+        "Better resilience to drought"
+      ]
+    }
+  ],
+  "documents": [
+    {
+      "id": "maize_efficiency_malawi_2007",
+      "title": "The efficiency of maize farming in Malawi: A bootstrapped translog frontier",
+      "author": "Hardwick Tchale, Johannes Sauer",
+      "year": "2007",
+      "abstract": "This study measures the level and determinants of technical efficiency of maize-based smallholder farmers using a bootstrapped translog stochastic frontier. Results show higher technical efficiency with integrated soil fertility management compared to inorganic fertilizer only.",
+      "keywords": ["maize", "efficiency", "Malawi", "smallholders", "soil fertility"],
+      "topics": ["Maize Production", "Farm Efficiency", "Soil Management"],
+      "source": "Cahiers d'Economie et de Sociologie Rurales"
+    },
+    {
+      "id": "maize_guide_malawi",
+      "title": "Malawi Maize Growers Guide",
+      "author": "Ministry of Agriculture",
+      "year": "2023",
+      "abstract": "Comprehensive guide for maize production in Malawi including variety selection, planting techniques, pest management, and post-harvest handling.",
+      "keywords": ["maize", "varieties", "planting", "Malawi", "guide"],
+      "topics": ["Maize Production", "Crop Management"],
+      "source": "Malawi Government Publication"
+    }
+  ]
+}
