@@ -155,9 +155,14 @@ class CabbageKnowledgeIngestion:
         """Create chemical nodes."""
         for chemical in chemicals:
             query = """
-            MERGE (ch:Chemical {name: $type})
-            SET ch.application_rate = $application_rate,
+            MERGE (ch:Chemical {name: $name})
+            SET ch.type = $type,
+                ch.alternative_name = $alternative_name,
+                ch.active_ingredient = $active_ingredient,
+                ch.application_rate = $application_rate,
                 ch.mixing_instructions = $mixing_instructions,
+                ch.target_pests = $target_pests,
+                ch.target_diseases = $target_diseases,
                 ch.safety_precautions = $safety_precautions,
                 ch.crop = 'Cabbage',
                 ch.source = 'expert_interview',
@@ -165,9 +170,14 @@ class CabbageKnowledgeIngestion:
             """
             
             self.db.execute_query(query, {
+                'name': chemical.get('name', chemical['type']),
                 'type': chemical['type'],
+                'alternative_name': chemical.get('alternative_name', ''),
+                'active_ingredient': chemical.get('active_ingredient', ''),
                 'application_rate': chemical['application_rate'],
                 'mixing_instructions': chemical['mixing_instructions'],
+                'target_pests': chemical.get('target_pests', []),
+                'target_diseases': chemical.get('target_diseases', []),
                 'safety_precautions': chemical['safety_precautions']
             })
         
@@ -209,12 +219,13 @@ class CabbageKnowledgeIngestion:
         
         # Crop -> TREATED_WITH -> Chemical
         for chemical in data['chemicals']:
+            chemical_name = chemical.get('name', chemical['type'])
             query = """
             MATCH (c:Crop {name: 'Cabbage'})
             MATCH (ch:Chemical {name: $chemical_name})
             MERGE (c)-[:TREATED_WITH]->(ch)
             """
-            self.db.execute_query(query, {'chemical_name': chemical['type']})
+            self.db.execute_query(query, {'chemical_name': chemical_name})
         
         logger.info("✅ Created all relationships")
     

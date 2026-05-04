@@ -124,15 +124,33 @@
       "chemicals": [
         {
           "type": "Pesticide",
+          "name": "Proffex Super",
+          "alternative_name": "Snowcron",
           "application_rate": "20ml per 16 litres spray",
-          "mixing_instructions": "Mix with fungicides for broad protection",
-          "safety_precautions": "Wear protective gear, spray during cool hours"
+          "mixing_instructions": "Mix with Success fungicide for broad protection",
+          "target_pests": ["Aphids", "Cabbage whitefly", "Diamondback moth", "Cabbage looper"],
+          "specific_treatments": {
+            "Aphids": "Snowcron or Proffex Super - apply at first sign of infestation",
+            "Cabbage whitefly": "Snowcron or Proffex Super - spray underside of leaves",
+            "Diamondback moth": "Snowcron or Proffex Super - early morning application",
+            "Cabbage looper": "Snowcron or Proffex Super - repeat every 7 days if needed"
+          },
+          "safety_precautions": "Wear protective gear, spray during cool hours, avoid spraying during flowering"
         },
         {
           "type": "Fungicide",
+          "name": "Success",
+          "active_ingredient": "Spinosad",
           "application_rate": "40-50 grams per 16 litres spray",
-          "mixing_instructions": "Mix with pesticides for combined protection",
-          "safety_precautions": "Use proper PPE, avoid inhalation"
+          "mixing_instructions": "Mix with Proffex Super or Snowcron for combined protection",
+          "target_diseases": ["Downy mildew", "Powdery mildew", "Leaf spot diseases", "Chiwawu"],
+          "specific_treatments": {
+            "Downy mildew": "Success fungicide - apply preventively in humid conditions",
+            "Powdery mildew": "Success fungicide - spray at first sign of white patches",
+            "Leaf spot diseases": "Success fungicide - apply every 7 days during rainy season",
+            "Chiwawu": "Success fungicide - apply immediately when symptoms appear"
+          },
+          "safety_precautions": "Use proper PPE, avoid inhalation, wait 3 days before harvest"
         }
       ],
       
@@ -163,7 +181,29 @@
         }
       ],
       
-      "regional_adaptations": {
+      "disease_prevention": {
+      "crop_rotation": {
+        "description": "Best method to deal with diseases is to practice crop rotation",
+        "benefits": [
+          "Breaks pest and disease cycles",
+          "Improves soil health and fertility",
+          "Reduces chemical dependency",
+          "Increases overall crop yields"
+        ],
+        "recommended_rotation": {
+          "cabbage": ["Rotate with legumes (beans, groundnuts)", "Rotate with cereals (maize, rice)", "Avoid planting cabbage in same field for 2-3 years"],
+          "rotation_sequence": "Cabbage → Legumes → Cereals → Vegetables (non-brassica) → Cabbage",
+          "minimum_interval": "2-3 years before planting cabbage in same field"
+        },
+        "implementation_tips": [
+          "Keep records of what was planted in each field",
+          "Plan rotation calendar in advance",
+          "Use rotation crops that have market value",
+          "Consider soil fertility needs of rotation crops"
+        ]
+      }
+    },
+    "regional_adaptations": {
         "dry_season": {
           "recommendations": [
             "Use sunken beds for water conservation",
