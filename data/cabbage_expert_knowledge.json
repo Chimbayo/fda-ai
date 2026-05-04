@@ -1,0 +1,184 @@
+{
+  "expert_report": {
+    "expert_id": "CABBAGE_001",
+    "specialization": "Cabbage Farming",
+    "date": "2024-05-04",
+    "source": "WhatsApp Expert Interview",
+    "data": {
+      "crops": [
+        {
+          "name": "Cabbage",
+          "type": "Vegetable",
+          "varieties": [
+            {
+              "name": "Garden Glory",
+              "type": "Local Variety",
+              "maturity_days": 180,
+              "yield_tons_ha": "15-20",
+              "characteristics": "Traditional variety, well-adapted to local conditions",
+              "market_acceptance": "High (local markets)"
+            },
+            {
+              "name": "Easy Seed",
+              "type": "Normal Hybrid",
+              "maturity_days": 120,
+              "yield_tons_ha": "25-30",
+              "characteristics": "Improved hybrid, good yield",
+              "market_acceptance": "Medium"
+            },
+            {
+              "name": "Star 3317",
+              "type": "F1 Hybrid",
+              "maturity_days": 90,
+              "yield_tons_ha": "35-40",
+              "characteristics": "Early maturing, high yield, uniform heads",
+              "market_acceptance": "High (formal markets)"
+            },
+            {
+              "name": "Malicanta",
+              "type": "F1 Hybrid",
+              "maturity_days": 90,
+              "yield_tons_ha": "35-40",
+              "characteristics": "Early maturing, disease resistant",
+              "market_acceptance": "High"
+            },
+            {
+              "name": "Kilimo",
+              "type": "F1 Hybrid",
+              "maturity_days": 90,
+              "yield_tons_ha": "35-40",
+              "characteristics": "Early maturing, good for processing",
+              "market_acceptance": "High"
+            }
+          ],
+          "spacing_cm": "30-60cm",
+          "nursery_duration_days": 30
+        }
+      ],
+      
+      "farming_methods": [
+        {
+          "name": "Nursery Preparation",
+          "stage": "Pre-planting",
+          "steps": [
+            "Disinfect nursery beds by burning",
+            "Add nutrients during disinfection",
+            "Sow in lines 2cm apart for easy fertilizer application",
+            "Match nursery after sowing for easy germination"
+          ],
+          "fertilizer_schedule": [
+            {
+              "timing": "After germination",
+              "type": "NPK",
+              "purpose": "Seedling development"
+            },
+            {
+              "timing": "Weekly",
+              "type": "Fungicides and Pesticides",
+              "purpose": "Pest prevention in nursery"
+            }
+          ]
+        },
+        {
+          "name": "Land Preparation",
+          "stage": "Pre-planting",
+          "steps": [
+            "Till land for easy seed penetration",
+            "Make beds or ridges",
+            "In dry season: make sunken beds or dig holes to conserve water"
+          ],
+          "considerations": "Water conservation critical in dry season"
+        },
+        {
+          "name": "Post-Transplanting Care",
+          "stage": "Growing",
+          "fertilizer_schedule": [
+            {
+              "timing": "7 days after transplanting",
+              "type": "Manure",
+              "application": "Basal application",
+              "purpose": "Organic nutrients"
+            },
+            {
+              "timing": "12 days after transplanting",
+              "type": "NPK",
+              "application": "Top dressing",
+              "purpose": "Growth promotion"
+            },
+            {
+              "timing": "26 days after transplanting",
+              "type": "NPK",
+              "application": "Top dressing",
+              "purpose": "Continued growth"
+            },
+            {
+              "timing": "40-46 days after transplanting",
+              "type": "CAN",
+              "application": "Top dressing",
+              "purpose": "Calcium supply"
+            }
+          ]
+        }
+      ],
+      
+      "chemicals": [
+        {
+          "type": "Pesticide",
+          "application_rate": "20ml per 16 litres spray",
+          "mixing_instructions": "Mix with fungicides for broad protection",
+          "safety_precautions": "Wear protective gear, spray during cool hours"
+        },
+        {
+          "type": "Fungicide",
+          "application_rate": "40-50 grams per 16 litres spray",
+          "mixing_instructions": "Mix with pesticides for combined protection",
+          "safety_precautions": "Use proper PPE, avoid inhalation"
+        }
+      ],
+      
+      "fertilizer_measurements": {
+        "unit": "Coca-Cola bottle top",
+        "approximate_volume_ml": "20-25ml",
+        "notes": "Common farmer measurement for small quantities"
+      },
+      
+      "harvesting": [
+        {
+          "variety_type": "F1 Hybrid",
+          "maturity_days": 90,
+          "expected_yield": "35-40 tons/ha",
+          "harvest_indicators": "Firm heads, proper size"
+        },
+        {
+          "variety_type": "Normal Hybrid",
+          "maturity_days": "120-150",
+          "expected_yield": "25-30 tons/ha",
+          "harvest_indicators": "Fully formed heads"
+        },
+        {
+          "variety_type": "Local Variety",
+          "maturity_days": 180,
+          "expected_yield": "15-20 tons/ha",
+          "harvest_indicators": "Mature heads"
+        }
+      ],
+      
+      "regional_adaptations": {
+        "dry_season": {
+          "recommendations": [
+            "Use sunken beds for water conservation",
+            "Dig individual holes for planting",
+            "Focus on drought-tolerant varieties"
+          ]
+        },
+        "rainy_season": {
+          "recommendations": [
+            "Use raised beds for drainage",
+            "Ensure proper spacing for air circulation",
+            "Apply fungicides preventively"
+          ]
+        }
+      }
+    }
+  }
+}
