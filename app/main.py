@@ -105,39 +105,6 @@ async def chat(request: ChatRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.post("/upload-pdf")
-async def upload_pdf(file: UploadFile = File(...)):
-    """
-    Upload a PDF file to the knowledge base.
-    """
-    try:
-        if not file.filename.endswith('.pdf'):
-            raise HTTPException(status_code=400, detail="Only PDF files are allowed")
-        
-        pdf_dir = Path("data/pdfs")
-        pdf_dir.mkdir(parents=True, exist_ok=True)
-        
-        file_path = pdf_dir / file.filename
-        
-        with open(file_path, "wb") as buffer:
-            shutil.copyfileobj(file.file, buffer)
-        
-        logger.info(f"Uploaded PDF: {file.filename}")
-        
-        # Reload knowledge base
-        success = reload_knowledge()
-        
-        return {
-            "message": f"PDF '{file.filename}' uploaded successfully",
-            "processed": success,
-            "filename": file.filename
-        }
-        
-    except Exception as e:
-        logger.error(f"Upload error: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
-
-
 @app.get("/knowledge-stats")
 async def knowledge_stats():
     """Get knowledge base statistics."""
