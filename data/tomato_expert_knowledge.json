@@ -1,0 +1,552 @@
+{
+  "expert_report": {
+    "expert_id": "PDF_TOMATO_001",
+    "specialization": "Tomato Farming",
+    "source": "PDF Documents: Agricultural Guides",
+    "date": "2024-05-05",
+    "data": {
+      "crops": [
+        {
+          "name": "Tomato",
+          "type": "Vegetable",
+          "scientific_name": "Solanum lycopersicum",
+          "varieties": [
+            {
+              "name": "or FF on the",
+              "type": "Open-pollinated",
+              "maturity_days": null,
+              "source": "PDF extraction"
+            },
+            {
+              "name": "Choosing Your Tomato",
+              "type": "Hybrid",
+              "maturity_days": null,
+              "source": "PDF extraction"
+            },
+            {
+              "name": "Choosing Your Tomato Variety  \nThere are hundreds of different tomato",
+              "type": "Hybrid",
+              "maturity_days": null,
+              "source": "PDF extraction"
+            },
+            {
+              "name": "So choosing the right",
+              "type": "Hybrid",
+              "maturity_days": null,
+              "source": "PDF extraction"
+            },
+            {
+              "name": "Fresh ma rket",
+              "type": "Hybrid",
+              "maturity_days": null,
+              "source": "PDF extraction"
+            },
+            {
+              "name": "and Shirley \nare also fresh market",
+              "type": "Hybrid",
+              "maturity_days": null,
+              "source": "PDF extraction"
+            },
+            {
+              "name": "Tomato",
+              "type": "Hybrid",
+              "maturity_days": null,
+              "source": "PDF extraction"
+            },
+            {
+              "name": "Cherry tomato",
+              "type": "Hybrid",
+              "maturity_days": null,
+              "source": "PDF extraction"
+            },
+            {
+              "name": "season and the",
+              "type": "Hybrid",
+              "maturity_days": null,
+              "source": "PDF extraction"
+            },
+            {
+              "name": "mea ns the",
+              "type": "Hybrid",
+              "maturity_days": null,
+              "source": "PDF extraction"
+            }
+          ],
+          "common_diseases": [
+            "Blight",
+            " Wilt",
+            "Spot",
+            "Rot",
+            "Mildew",
+            "Early Blight",
+            "Late Blight",
+            "Fusarium Wilt",
+            "Powdery Mildew",
+            "Blight",
+            " Wilt",
+            "Spot",
+            "Rot",
+            "Virus",
+            "Bacterial Wilt"
+          ],
+          "common_pests": [
+            "Aphid",
+            "Hornworm",
+            "Cutworm",
+            "Fruitworm",
+            "Aphid",
+            "Thrips",
+            "Nematode"
+          ],
+          "farming_methods": [
+            "Planting",
+            "Watering",
+            "Fertilizing",
+            "Staking",
+            "Soil Preparation",
+            "Planting",
+            "Watering",
+            "Fertilizing",
+            "Pruning",
+            "Staking",
+            "Soil Preparation"
+          ],
+          "harvesting_methods": [
+            "Hand harvesting",
+            "Hand harvesting"
+          ]
+        }
+      ],
+      "varieties": [
+        {
+          "name": "or FF on the",
+          "type": "Open-pollinated",
+          "maturity_days": null,
+          "source": "PDF extraction"
+        },
+        {
+          "name": "Choosing Your Tomato",
+          "type": "Hybrid",
+          "maturity_days": null,
+          "source": "PDF extraction"
+        },
+        {
+          "name": "Choosing Your Tomato Variety  \nThere are hundreds of different tomato",
+          "type": "Hybrid",
+          "maturity_days": null,
+          "source": "PDF extraction"
+        },
+        {
+          "name": "So choosing the right",
+          "type": "Hybrid",
+          "maturity_days": null,
+          "source": "PDF extraction"
+        },
+        {
+          "name": "Fresh ma rket",
+          "type": "Hybrid",
+          "maturity_days": null,
+          "source": "PDF extraction"
+        },
+        {
+          "name": "and Shirley \nare also fresh market",
+          "type": "Hybrid",
+          "maturity_days": null,
+          "source": "PDF extraction"
+        },
+        {
+          "name": "Tomato",
+          "type": "Hybrid",
+          "maturity_days": null,
+          "source": "PDF extraction"
+        },
+        {
+          "name": "Cherry tomato",
+          "type": "Hybrid",
+          "maturity_days": null,
+          "source": "PDF extraction"
+        },
+        {
+          "name": "season and the",
+          "type": "Hybrid",
+          "maturity_days": null,
+          "source": "PDF extraction"
+        },
+        {
+          "name": "mea ns the",
+          "type": "Hybrid",
+          "maturity_days": null,
+          "source": "PDF extraction"
+        }
+      ],
+      "farming_methods": [
+        {
+          "name": "Planting",
+          "description": "Common Tomato Pests & Diseases  \nUC Master Gardener  Program of Contra Costa County —Guide to Growing Tomatoes  \nDespite all the planning and preparation that goes into planting a garden, insects and diseases can still \nfrustrate even the best gardeners CONTR OLS:  Avoid sprinkler irrigation, very dense planting, or other things which keep humidity high CONTROLS :  Eliminate weeds around garden beds at least two weeks before planting",
+          "stage": "Pre-planting",
+          "source": "PDF extraction"
+        },
+        {
+          "name": "Watering",
+          "description": "Cool humid \nweather or overhead irrigation encourage Early Blight, wh ich is spread by splashing water and germinates \non moist leaves CONTROLS :  Avoid getting water on the leaves when ever possible, change the locations where you plant \nyour tomatoes, mulch well around each plant, and clear away all dead or infected plant m aterial at the end \nof each season They can be distinguished from Early Blight by the water -soaked appearance of \nthe spots, and the fact that the spots don't cross the larger veins",
+          "stage": "Growing",
+          "source": "PDF extraction"
+        },
+        {
+          "name": "Fertilizing",
+          "description": "STINKBUGS  are an annoyance to tomato growers, as their feeding can cause corky white patches under the \nskin of ripe tomatoes",
+          "stage": "Growing",
+          "source": "PDF extraction"
+        },
+        {
+          "name": "Staking",
+          "description": "CONTROLS :  Keep tomato plants and especially fruit off the ground by using cages or staking",
+          "stage": "Growing",
+          "source": "PDF extraction"
+        },
+        {
+          "name": "Soil Preparation",
+          "description": "LATE BLIGHT  is caused by Phytophth ora infestans , a fungal disease most famous for the Irish potato \nfamine FUSARIUM WILT is caused by  a soil -borne fungus ( Fusarium oxysporum ) which infects the roots and stems \nof tomatoes CONTROLS :  Fusarium can survive a long time in the soil, and it is spread by shoes, garden tools, and \nanything else which moves soil a round",
+          "stage": "Pre-planting",
+          "source": "PDF extraction"
+        },
+        {
+          "name": "Planting",
+          "description": "5 \nSeed or Transplants Transplanting You should select your tomato varieties based on the fruit quality, adaptab ility and \nreliability, disease resistance, plant growth habit, market preferences and planting time \n(date to maturity)",
+          "stage": "Pre-planting",
+          "source": "PDF extraction"
+        },
+        {
+          "name": "Watering",
+          "description": "They have a good firm texture, plenty of flesh and a sweet, mellow \nflavour due to low acidity and high water content While tomatoes can \nproduce in a variety of soils, they are bett er suited to fertile, well -drained and moisture \nretentive soils 6 | P a g e  \n c) Seed trays : Dilute your starter fertiliser with water and hand mi x with soil",
+          "stage": "Growing",
+          "source": "PDF extraction"
+        },
+        {
+          "name": "Fertilizing",
+          "description": "The soil pH influences plant growth, nutrients and the activities of \n \n5 | P a g e  \n microorganisms in the soil Be careful to mix and apply starter fertilizer according to the \nmanufacturer’s recommendations Fertilisation  \nThe tomato is a heavy feeder of plant nutrients including nitrogen, phosphorus and \npotassium and it responds well to organic fertilisers",
+          "stage": "Growing",
+          "source": "PDF extraction"
+        },
+        {
+          "name": "Pruning",
+          "description": "Trelli sing and Pruning Trellising and Pruning  \na) Trellising : Cultivars that have an indeterminate growth habit require training on \ntrellises or suspended on twine  from overhead wires b) Pruning Your Tomato Plants : If you stake your plants you should prune them by \nhand",
+          "stage": "Growing",
+          "source": "PDF extraction"
+        },
+        {
+          "name": "Staking",
+          "description": "Understanding these terms will help you select which varieties to grow, \nwhere to plant them a nd how you will support them 4 | P a g e  \n  Need lots of space  \n Need staking or trellis t o support them and maximize their potential  \n Produce later in season  \n Ripen fruit throughout the season  \n Are great for eating alone  \n Are more convenient for drying  \nOccasionally you see semi -determinate, which means it has habits of both determinate \nand indeterminate Have your support systems ready at the time of planting",
+          "stage": "Growing",
+          "source": "PDF extraction"
+        },
+        {
+          "name": "Soil Preparation",
+          "description": "Soil Preparation 9 \nb) Phosphorous (P):  Preparing your soil",
+          "stage": "Pre-planting",
+          "source": "PDF extraction"
+        }
+      ],
+      "diseases": [
+        {
+          "name": "Blight",
+          "symptoms": [
+            "d by the fungus Alternaria solani ",
+            "d by Phytophth ora infestans , a fungal disease most famous for the Irish potato \nfamine"
+          ],
+          "treatments": [
+            "Treatment information available in PDF"
+          ],
+          "prevention": [
+            "Prevention information available in PDF"
+          ],
+          "source": "PDF extraction"
+        },
+        {
+          "name": " Wilt",
+          "symptoms": [
+            "d by  a soil -borne fungus ( Fusarium oxysporum ) which infects the roots and stems \nof tomatoes"
+          ],
+          "treatments": [
+            "Treatment information available in PDF"
+          ],
+          "prevention": [
+            "Prevention information available in PDF"
+          ],
+          "source": "PDF extraction"
+        },
+        {
+          "name": "Spot",
+          "symptoms": [
+            "d by the fungus Alternaria solani "
+          ],
+          "treatments": [
+            "Treatment information available in PDF"
+          ],
+          "prevention": [
+            "Prevention information available in PDF"
+          ],
+          "source": "PDF extraction"
+        },
+        {
+          "name": "Rot",
+          "symptoms": [
+            "Symptoms information available in PDF"
+          ],
+          "treatments": [
+            "Treatment information available in PDF"
+          ],
+          "prevention": [
+            "Prevention information available in PDF"
+          ],
+          "source": "PDF extraction"
+        },
+        {
+          "name": "Mildew",
+          "symptoms": [
+            "much damage"
+          ],
+          "treatments": [
+            "Treatment information available in PDF"
+          ],
+          "prevention": [
+            "Prevention information available in PDF"
+          ],
+          "source": "PDF extraction"
+        },
+        {
+          "name": "Early Blight",
+          "symptoms": [
+            "d by the fungus Alternaria solani "
+          ],
+          "treatments": [
+            "Treatment information available in PDF"
+          ],
+          "prevention": [
+            "Prevention information available in PDF"
+          ],
+          "source": "PDF extraction"
+        },
+        {
+          "name": "Late Blight",
+          "symptoms": [
+            "d by Phytophth ora infestans , a fungal disease most famous for the Irish potato \nfamine"
+          ],
+          "treatments": [
+            "Treatment information available in PDF"
+          ],
+          "prevention": [
+            "Prevention information available in PDF"
+          ],
+          "source": "PDF extraction"
+        },
+        {
+          "name": "Fusarium Wilt",
+          "symptoms": [
+            "d by  a soil -borne fungus ( Fusarium oxysporum ) which infects the roots and stems \nof tomatoes"
+          ],
+          "treatments": [
+            "Treatment information available in PDF"
+          ],
+          "prevention": [
+            "Prevention information available in PDF"
+          ],
+          "source": "PDF extraction"
+        },
+        {
+          "name": "Powdery Mildew",
+          "symptoms": [
+            "much damage"
+          ],
+          "treatments": [
+            "Treatment information available in PDF"
+          ],
+          "prevention": [
+            "Prevention information available in PDF"
+          ],
+          "source": "PDF extraction"
+        },
+        {
+          "name": "Blight",
+          "symptoms": [
+            "Symptoms information available in PDF"
+          ],
+          "treatments": [
+            "Treatment information available in PDF"
+          ],
+          "prevention": [
+            "Prevention information available in PDF"
+          ],
+          "source": "PDF extraction"
+        },
+        {
+          "name": " Wilt",
+          "symptoms": [
+            "Symptoms information available in PDF"
+          ],
+          "treatments": [
+            "Treatment information available in PDF"
+          ],
+          "prevention": [
+            "Prevention information available in PDF"
+          ],
+          "source": "PDF extraction"
+        },
+        {
+          "name": "Spot",
+          "symptoms": [
+            "Symptoms information available in PDF"
+          ],
+          "treatments": [
+            "Treatment information available in PDF"
+          ],
+          "prevention": [
+            "Prevention information available in PDF"
+          ],
+          "source": "PDF extraction"
+        },
+        {
+          "name": "Rot",
+          "symptoms": [
+            "Symptoms information available in PDF"
+          ],
+          "treatments": [
+            "Treatment information available in PDF"
+          ],
+          "prevention": [
+            "Prevention information available in PDF"
+          ],
+          "source": "PDF extraction"
+        },
+        {
+          "name": "Virus",
+          "symptoms": [
+            "Symptoms information available in PDF"
+          ],
+          "treatments": [
+            "Treatment information available in PDF"
+          ],
+          "prevention": [
+            "Prevention information available in PDF"
+          ],
+          "source": "PDF extraction"
+        },
+        {
+          "name": "Bacterial Wilt",
+          "symptoms": [
+            "Symptoms information available in PDF"
+          ],
+          "treatments": [
+            "Treatment information available in PDF"
+          ],
+          "prevention": [
+            "Prevention information available in PDF"
+          ],
+          "source": "PDF extraction"
+        }
+      ],
+      "pests": [
+        {
+          "name": "Aphid",
+          "damage_symptoms": [
+            "Damage information available in PDF"
+          ],
+          "control_methods": [
+            "Control information available in PDF"
+          ],
+          "source": "PDF extraction"
+        },
+        {
+          "name": "Hornworm",
+          "damage_symptoms": [
+            "Damage information available in PDF"
+          ],
+          "control_methods": [
+            "Control information available in PDF"
+          ],
+          "source": "PDF extraction"
+        },
+        {
+          "name": "Cutworm",
+          "damage_symptoms": [
+            "Damage information available in PDF"
+          ],
+          "control_methods": [
+            "Control information available in PDF"
+          ],
+          "source": "PDF extraction"
+        },
+        {
+          "name": "Fruitworm",
+          "damage_symptoms": [
+            "Damage information available in PDF"
+          ],
+          "control_methods": [
+            "Control information available in PDF"
+          ],
+          "source": "PDF extraction"
+        },
+        {
+          "name": "Aphid",
+          "damage_symptoms": [
+            "Damage information available in PDF"
+          ],
+          "control_methods": [
+            "Control information available in PDF"
+          ],
+          "source": "PDF extraction"
+        },
+        {
+          "name": "Thrips",
+          "damage_symptoms": [
+            "Damage information available in PDF"
+          ],
+          "control_methods": [
+            "Control information available in PDF"
+          ],
+          "source": "PDF extraction"
+        },
+        {
+          "name": "Nematode",
+          "damage_symptoms": [
+            "Damage information available in PDF"
+          ],
+          "control_methods": [
+            "Control information available in PDF"
+          ],
+          "source": "PDF extraction"
+        }
+      ],
+      "chemicals": [],
+      "harvesting": [
+        {
+          "method": "Hand harvesting",
+          "timing": "When fruits are fully colored and firm",
+          "techniques": "Picking off infected leaves may slow the progression of the disease until the weather is \nmore favorable Hand -picking \ncutworms at night may help, or you can protect seedlings with cardboard collars or one or more tooth picks \n(inserted close and parallel to the stem) The mature caterpillars drop to the ground and pupate in the soil over the winter",
+          "storage": "Store in cool, dry place",
+          "source": "PDF extraction"
+        },
+        {
+          "method": "Hand harvesting",
+          "timing": "When fruits are fully colored and firm",
+          "techniques": "Post -Harvest Handling  Grow in smaller spaces  \n They need little to no staking  \n Their fruit all ripen within a short period of time  \n Tend to ripen more closely together  Make up most of the commercial and early ripening varieties  \n Are the best type for tomato paste  \n b",
+          "storage": "Store in cool, dry place",
+          "source": "PDF extraction"
+        }
+      ],
+      "regional_adaptations": {
+        "malawi_climate": {
+          "planting_season": "March - May (winter planting) and August - October (summer planting)",
+          "temperature_range": "15-30°C optimal",
+          "rainfall_requirements": "Regular watering, 25-50mm per week",
+          "soil_type": "Well-drained loamy soils, pH 6.0-6.8",
+          "challenges": [
+            "High temperatures",
+            "Heavy rains",
+            "Pest pressure"
+          ]
+        }
+      }
+    }
+  }
+}
