@@ -115,8 +115,8 @@ class OllamaModel:
                 logger.debug(f"Cache hit: {cache_key[:8]}...")
                 return _response_cache[cache_key]
         
-        # Compress prompt for speed
-        compressed_prompt = self._compress_prompt(prompt, self.max_context_length)
+        # Use prompt directly for now (compression disabled for stability)
+        compressed_prompt = prompt
         
         messages = []
         
@@ -171,54 +171,6 @@ class OllamaModel:
                     return "I apologize, but I'm having trouble generating a response. Please try again."
                     
         except aiohttp.ClientError as e:
-            logger.error(f"Ollama connection error: {e}")
-            return "I'm unable to connect to the language model. Please check if Ollama is running."
-        except Exception as e:
-            logger.error(f"Unexpected error: {e}")
-            return "An unexpected error occurred. Please try again."
-    
-    async def generate_stream(
-        self,
-        prompt: str,
-        system_prompt: Optional[str] = None,
-        temperature: Optional[float] = None
-    ) -> AsyncGenerator[str, None]:
-        """
-        Generate text with streaming response.
-        
-        Args:
-            prompt: User prompt
-            system_prompt: Optional system prompt
-            temperature: Sampling temperature
-            
-        Yields:
-            Generated text chunks
-        """
-        temp = temperature or self.temperature
-        
-        messages = []
-        
-        if system_prompt:
-            messages.append({
-                "role": "system",
-                "content": system_prompt
-            })
-        
-        messages.append({
-            "role": "user",
-            "content": prompt
-        })
-        
-        payload = {
-            "model": self.model,
-            "messages": messages,
-            "stream": True,
-            "options": {
-                "temperature": temp
-            }
-        }
-        
-        try:
             async with aiohttp.ClientSession() as session:
                 async with session.post(
                     f"{self.base_url}/api/chat",

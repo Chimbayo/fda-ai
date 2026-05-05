@@ -90,8 +90,8 @@ async def chat(request: ChatRequest):
     try:
         logger.info(f"Received query: {request.message}")
         
-        # Get answer from RAG system
-        result = get_answer(request.message)
+        # Get answer from RAG system (handle async properly)
+        result = await get_answer(request.message)
         
         return ChatResponse(
             response=result["answer"],

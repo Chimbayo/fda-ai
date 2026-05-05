@@ -4,6 +4,7 @@ Uses local PDF knowledge + Ollama for responses.
 NO OpenAI API - completely local.
 """
 import logging
+import asyncio
 from typing import Dict, Any, List
 
 from app.database.pdf_ingestion import PDFIngestion
@@ -39,7 +40,7 @@ Your responses should:
 - Cite specific information from the Context when possible
 - Be honest about limitations of the provided documents"""
     
-    def query(self, question: str, k: int = 5) -> Dict[str, Any]:
+    async def query(self, question: str, k: int = 5) -> Dict[str, Any]:
         """
         Query the RAG system.
         
@@ -90,11 +91,11 @@ Your responses should:
 
 Question: {question}
 
-Answer based ONLY on the Context provided above. If the answer is not in the Context, clearly state that the documents don't contain this information."""
+Answer based ONLY on the Context provided above. If the answer is not in the Context, clearly state that documents don't contain this information."""
             
-            # Generate response
+            # Generate response (handle async properly)
             logger.info("Generating response with Ollama...")
-            answer = self.llm.generate(
+            answer = await self.llm.generate(
                 user_prompt,
                 system_prompt=self.system_prompt,
                 temperature=0.1  # Low temperature for strict adherence
@@ -115,8 +116,8 @@ Answer based ONLY on the Context provided above. If the answer is not in the Con
             if is_generic:
                 logger.warning("Model gave generic response, forcing context usage")
                 # Retry with stronger prompt
-                user_prompt += "\n\nREMEMBER: The Context above contains ALL the information you have. Do NOT use any external knowledge."
-                answer = self.llm.generate(user_prompt, system_prompt=self.system_prompt, temperature=0.0)
+                user_prompt += "\n\nREMEMBER: The Context above contains ALL of information you have. Do NOT use any external knowledge."
+                answer = await self.llm.generate(user_prompt, system_prompt=self.system_prompt, temperature=0.0)
             
             return {
                 "answer": answer,
@@ -148,7 +149,7 @@ Answer based ONLY on the Context provided above. If the answer is not in the Con
 rag_system = RAGSystem()
 
 
-def get_answer(question: str) -> Dict[str, Any]:
+async def get_answer(question: str) -> Dict[str, Any]:
     """
     Simple interface to get answer from RAG.
     
@@ -158,7 +159,7 @@ def get_answer(question: str) -> Dict[str, Any]:
     Returns:
         Answer dictionary
     """
-    return rag_system.query(question)
+    return await rag_system.query(question)
 
 
 def get_stats() -> Dict[str, Any]:
