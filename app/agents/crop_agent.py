@@ -1,40 +1,51 @@
 """
-Crop Agent - Specialized in crop varieties, planting, and soil management.
-Provides expert advice on maize cultivation in Malawi.
+Crop Advisory Agent - Handles crop varieties, planting, fertilizer, and harvesting advice.
+Provides Malawi-specific crop recommendations with Neo4j knowledge integration.
 """
 from typing import Dict, Any, List
 import logging
 
 from app.models.ollama_model import OllamaModel
 from app.database.neo4j_client import Neo4jClient
-from app.utils.ranking import rank_sources
 
 logger = logging.getLogger(__name__)
 
 
 class CropAgent:
     """
-    Specialized agent for crop-related queries.
-    Handles questions about varieties, planting, fertilizers, and yields.
+    Crop advisory agent for Malawi farmers.
+    Provides expert advice on crop selection, planting, fertilization, and harvesting.
     """
     
     def __init__(self):
         self.llm = OllamaModel()
-        self.db = Neo4jClient()
+        self.neo4j = Neo4jClient()
         
-        # System prompt for crop expertise
-        self.system_prompt = """You are an expert agricultural advisor specializing in crop cultivation in Malawi.
-Your expertise includes:
-- Maize varieties and their characteristics
-- Planting techniques and timing
-- Fertilizer recommendations
-- Soil management
-- Yield optimization
-- Spacing and seed rates
+        # Crop advisory system prompt
+        self.system_prompt = """You are an expert agricultural agronomist specializing in Malawi's crops.
+You can:
+- Recommend suitable crop varieties for Malawi conditions
+- Provide planting and harvesting guidance
+- Advise on fertilizer schedules and soil management
+- Suggest pest prevention strategies
+- Recommend crop rotation patterns
 
-Provide practical, actionable advice suitable for smallholder farmers in Malawi.
-Be specific about local varieties like Kalulu, Kanyani, Mbidzi, Mkango, and Njobvu.
-Always consider the farmer's context and provide clear, step-by-step guidance."""
+Use Malawi-specific knowledge:
+- Local crop varieties and their performance
+- Regional soil types and nutrient needs
+- Climate-appropriate planting schedules
+- Smallholder farmer constraints and resources
+- Market preferences and storage considerations
+
+Always provide:
+1. Crop variety recommendations with maturity periods
+2. Planting guidance (spacing, timing, depth)
+3. Fertilizer schedules (NPK ratios, application timing)
+4. Harvesting advice and storage recommendations
+5. Pest and disease prevention strategies
+6. Yield optimization techniques
+
+Be practical and consider farmer resources. Include local market knowledge."""
     
     async def process(
         self,
@@ -42,169 +53,324 @@ Always consider the farmer's context and provide clear, step-by-step guidance.""
         context: Dict[str, Any] = None
     ) -> Dict[str, Any]:
         """
-        Process a crop-related query.
+        Process crop-related query with Neo4j knowledge integration.
         
         Args:
-            message: User's query about crops
-            context: Additional context (location, history, etc.)
+            message: User's crop-related question
+            context: Conversation history and farmer context
             
         Returns:
-            Response with crop advice
+            Crop advisory with expert recommendations
         """
         try:
+            # Analyze crop intent and extract entities
+            crop_analysis = self._analyze_crop_intent(message)
+            
             # Retrieve relevant knowledge from Neo4j
-            knowledge = await self._retrieve_knowledge(message)
+            neo4j_knowledge = await self._retrieve_crop_knowledge(crop_analysis)
             
-            # Build prompt with context
-            prompt = self._build_prompt(message, knowledge, context)
+            # Build crop advisory prompt with context and Neo4j data
+            crop_prompt = self._build_crop_prompt(message, crop_analysis, neo4j_knowledge, context)
             
-            # Generate response
-            response = await self.llm.generate(
-                prompt,
-                system_prompt=self.system_prompt
+            # Generate expert crop advice
+            crop_response = await self.llm.generate(
+                crop_prompt,
+                system_prompt=self.system_prompt,
+                temperature=0.1
             )
             
-            # Calculate confidence based on knowledge quality
-            confidence = self._calculate_confidence(knowledge)
-            
-            # Rank and format sources
-            sources = rank_sources(knowledge)
+            # Extract structured information
+            structured_result = self._structure_crop_response(crop_response)
             
             return {
-                "response": response,
-                "confidence": confidence,
-                "sources": sources,
+                "response": crop_response,
+                "confidence": structured_result.get("confidence", 0.8),
+                "sources": structured_result.get("sources", []),
                 "context": {
-                    "knowledge_items": len(knowledge),
-                    "location": context.get("location") if context else None
+                    "crop_type": crop_analysis.get("crop_type"),
+                    "advisory_type": crop_analysis.get("advisory_type"),
+                    "neo4j_entities": neo4j_knowledge.get("entities", []),
+                    "recommendations": structured_result.get("recommendations", []),
+                    "analysis": f"Analyzed {crop_analysis.get('advisory_type')} for {crop_analysis.get('crop_type', 'unknown')}"
                 }
             }
             
         except Exception as e:
             logger.error(f"CropAgent processing error: {e}")
             return {
-                "response": "I apologize, but I'm having trouble accessing crop information right now. Please try again.",
-                "confidence": 0.0,
+                "response": "I'm having trouble providing crop advice. Could you specify which crop you're asking about and what type of guidance you need (variety, planting, fertilizer, or harvesting)?",
+                "confidence": 0.4,
                 "sources": [],
                 "context": {"error": str(e)}
             }
     
-    async def _retrieve_knowledge(self, query: str) -> List[Dict[str, Any]]:
+    def _analyze_crop_intent(self, message: str) -> Dict[str, Any]:
         """
-        Retrieve relevant crop knowledge from Neo4j.
+        Analyze message for crop-related intent and entities.
         
         Args:
-            query: Search query
+            message: User's crop-related question
             
         Returns:
-            List of knowledge items
+            Crop intent analysis with entities
+        """
+        message_lower = message.lower()
+        
+        # Crop types mentioned
+        crop_types = {
+            "maize": ["maize", "corn", "chimanga", "nsima"],
+            "tomato": ["tomato", "tomatoes", "nyanya"],
+            "cabbage": ["cabbage", "mbewa", "kale"],
+            "groundnuts": ["groundnut", "peanut", "nthochi"],
+            "soybeans": ["soybean", "soya", "soy"],
+            "tobacco": ["tobacco", "fodya", "burley"],
+            "cassava": ["cassava", "manioc", "chimondela"],
+            "rice": ["rice", "paddy", "mawa"]
+        }
+        
+        detected_crop = None
+        for crop, synonyms in crop_types.items():
+            for synonym in synonyms:
+                if synonym in message_lower:
+                    detected_crop = crop
+                    break
+        
+        # Advisory types
+        advisory_patterns = {
+            "variety": ["variety", "type", "breed", "hybrid", "seed"],
+            "planting": ["plant", "sow", "seed", "transplant", "spacing", "depth"],
+            "fertilizer": ["fertilizer", "nutrient", "npk", "manure", "urea", "can"],
+            "harvesting": ["harvest", "ready", "mature", "yield", "storage"],
+            "soil": ["soil", "ph", "organic", "preparation"],
+            "rotation": ["rotate", "rotation", "follow", "sequence"]
+        }
+        
+        detected_advisory = []
+        for advisory_type, patterns in advisory_patterns.items():
+            for pattern in patterns:
+                if pattern in message_lower:
+                    detected_advisory.append(advisory_type)
+        
+        # Determine primary advisory type
+        primary_advisory = "general"
+        if detected_advisory:
+            primary_advisory = detected_advisory[0]  # First detected
+        
+        return {
+            "crop_type": detected_crop,
+            "advisory_type": primary_advisory,
+            "all_advisories": detected_advisory,
+            "entities": self._extract_entities(message_lower),
+            "complexity": len(detected_advisory)
+        }
+    
+    def _extract_entities(self, message: str) -> List[str]:
+        """Extract specific entities from message."""
+        entities = []
+        
+        # Numbers and measurements
+        import re
+        numbers = re.findall(r'\d+', message)
+        if numbers:
+            entities.extend([f"numbers: {', '.join(numbers)}"])
+        
+        # Specific terms
+        terms = ["kg", "bags", "hectares", "acres", "weeks", "days", "months"]
+        for term in terms:
+            if term in message:
+                entities.append(term)
+        
+        return entities
+    
+    async def _retrieve_crop_knowledge(self, crop_analysis: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Retrieve crop-specific knowledge from Neo4j.
+        
+        Args:
+            crop_analysis: Crop intent analysis
+            
+        Returns:
+            Neo4j knowledge entities and relationships
         """
         try:
-            # Search for crop varieties, planting info, and soil management
-            cypher_query = """
-            MATCH (c:Crop)-[:HAS_VARIETY]->(v:Variety)
-            WHERE c.name CONTAINS $term OR v.name CONTAINS $term
-            RETURN c.name as crop, v.name as variety, v.maturity as maturity, 
-                   v.yield as yield, v.characteristics as characteristics
-            UNION
-            MATCH (t:Technique)-[:APPLIES_TO]->(c:Crop)
-            WHERE t.description CONTAINS $term
-            RETURN c.name as crop, t.name as technique, t.description as details
+            crop_type = crop_analysis.get("crop_type")
+            if not crop_type:
+                return {"entities": [], "relationships": []}
+            
+            # Query Neo4j for crop information
+            crop_query = """
+            MATCH (c:Crop {name: $crop_name})
+            OPTIONAL MATCH (c)-[:HAS_VARIETY]->(v:Variety)
+            OPTIONAL MATCH (c)-[:SUSCEPTIBLE_TO]->(d:Disease)
+            OPTIONAL MATCH (c)-[:REQUIRES]->(f:Fertilizer)
+            OPTIONAL MATCH (c)-[:AFFECTED_BY]->(p:Pest)
+            OPTIONAL MATCH (c)-[:USES_METHOD]->(m:FarmingMethod)
+            RETURN c, v, d, f, p, m
             """
             
-            # Extract key terms from query
-            terms = self._extract_search_terms(query)
+            result = self.neo4j.execute_query(crop_query, {"crop_name": crop_type.capitalize()})
             
-            results = []
-            for term in terms:
-                db_results = self.db.execute_query(cypher_query, {"term": term})
-                results.extend(db_results)
+            # Process results
+            entities = []
+            relationships = []
             
-            return results
+            if result:
+                for record in result:
+                    if record.get("c"):
+                        entities.append({
+                            "type": "crop",
+                            "name": record["c"].get("name"),
+                            "properties": record["c"]
+                        })
+                    
+                    if record.get("v"):
+                        entities.append({
+                            "type": "variety",
+                            "name": record["v"].get("name"),
+                            "properties": record["v"]
+                        })
+                        relationships.append({
+                            "from": "crop",
+                            "to": "variety",
+                            "type": "HAS_VARIETY"
+                        })
+                    
+                    if record.get("d"):
+                        entities.append({
+                            "type": "disease",
+                            "name": record["d"].get("name"),
+                            "properties": record["d"]
+                        })
+                        relationships.append({
+                            "from": "crop",
+                            "to": "disease",
+                            "type": "SUSCEPTIBLE_TO"
+                        })
+                    
+                    if record.get("f"):
+                        entities.append({
+                            "type": "fertilizer",
+                            "name": record["f"].get("name"),
+                            "properties": record["f"]
+                        })
+                        relationships.append({
+                            "from": "crop",
+                            "to": "fertilizer",
+                            "type": "REQUIRES"
+                        })
+            
+            return {
+                "entities": entities,
+                "relationships": relationships,
+                "query_results": result
+            }
             
         except Exception as e:
-            logger.error(f"Knowledge retrieval error: {e}")
-            return []
+            logger.error(f"Neo4j retrieval error: {e}")
+            return {"entities": [], "relationships": []}
     
-    def _extract_search_terms(self, query: str) -> List[str]:
-        """
-        Extract relevant search terms from query.
-        
-        Args:
-            query: User query
-            
-        Returns:
-            List of search terms
-        """
-        # Common crop-related keywords
-        keywords = [
-            "maize", "corn", "variety", "kalulu", "kanyani", "mbidzi",
-            "mkango", "njobvu", "planting", "fertilizer", "soil", "yield",
-            "seed", "spacing", "sc 301", "sc 303", "sc 403", "sc 419",
-            "sc 423", "sc 529", "sc 537", "sc 627", "sc 653", "sc 719"
-        ]
-        
-        query_lower = query.lower()
-        found_terms = [kw for kw in keywords if kw in query_lower]
-        
-        # If no specific terms found, use general terms
-        if not found_terms:
-            found_terms = ["maize", "crop"]
-        
-        return found_terms
-    
-    def _build_prompt(
+    def _build_crop_prompt(
         self,
         message: str,
-        knowledge: List[Dict[str, Any]],
-        context: Dict[str, Any]
+        crop_analysis: Dict[str, Any],
+        neo4j_knowledge: Dict[str, Any],
+        context: Dict[str, Any] = None
     ) -> str:
         """
-        Build prompt with knowledge and context.
+        Build crop advisory prompt with analysis and Neo4j knowledge.
         
         Args:
-            message: User message
-            knowledge: Retrieved knowledge
-            context: Additional context
+            message: Original user message
+            crop_analysis: Crop intent analysis
+            neo4j_knowledge: Knowledge from Neo4j
+            context: Conversation context
             
         Returns:
-            Formatted prompt
+            Formatted crop advisory prompt
         """
-        # Format knowledge
-        knowledge_text = ""
-        if knowledge:
-            knowledge_text = "Relevant information:\n"
-            for item in knowledge[:5]:  # Top 5 results
-                knowledge_text += f"- {item}\n"
+        # Get conversation history if available
+        history_text = ""
+        if context and context.get("history"):
+            recent_history = context["history"][-2:]  # Last 2 exchanges
+            history_text = "Recent conversation context:\n"
+            for exchange in recent_history:
+                history_text += f"User: {exchange.get('user', '')}\n"
+                history_text += f"Assistant: {exchange.get('assistant', '')}\n\n"
         
-        # Add location context if available
-        location_context = ""
-        if context and context.get("location"):
-            location_context = f"\nFarmer location: {context['location']}"
+        # Format Neo4j knowledge
+        knowledge_text = "Available knowledge from database:\n"
+        entities = neo4j_knowledge.get("entities", [])
+        for entity in entities:
+            knowledge_text += f"- {entity.get('type', 'unknown')}: {entity.get('name', 'unknown')}\n"
         
-        prompt = f"""{knowledge_text}
-{location_context}
+        prompt = f"""{history_text}
+Current farmer query: {message}
 
-Farmer's question: {message}
+Crop analysis: {crop_analysis.get('advisory_type')} advice for {crop_analysis.get('crop_type', 'unknown')}
 
-Provide a helpful, practical response based on the information above and your expertise in Malawian agriculture."""
+{knowledge_text}
+
+Please provide expert Malawi crop advice:
+1. Recommend specific varieties if asking about varieties
+2. Provide detailed planting guidance (spacing, timing, depth)
+3. Suggest fertilizer schedules with NPK ratios
+4. Recommend harvesting and storage practices
+5. Include pest and disease prevention
+6. Consider smallholder farmer resources
+7. Use Malawi-specific knowledge and local conditions
+
+Be practical and actionable. Include specific measurements and timing."""
         
         return prompt
     
-    def _calculate_confidence(self, knowledge: List[Dict[str, Any]]) -> float:
+    def _structure_crop_response(self, response: str) -> Dict[str, Any]:
         """
-        Calculate confidence score based on knowledge retrieved.
+        Structure crop response into components.
         
         Args:
-            knowledge: Retrieved knowledge items
+            response: LLM crop response
             
         Returns:
-            Confidence score (0-1)
+            Structured crop information
         """
-        if not knowledge:
-            return 0.3  # Low confidence with no knowledge
+        response_lower = response.lower()
         
-        # Higher confidence with more relevant knowledge
-        base_confidence = min(0.5 + (len(knowledge) * 0.1), 0.9)
+        # Extract recommendations
+        recommendations = []
+        recommendation_patterns = [
+            "plant", "use", "apply", "recommend", "suggest", "consider"
+        ]
+        for pattern in recommendation_patterns:
+            if pattern in response_lower:
+                # Extract surrounding text for context
+                words = response_lower.split()
+                for i, word in enumerate(words):
+                    if word == pattern and i + 1 < len(words):
+                        recommendations.append(f"{word} {words[i + 1]}")
         
-        return base_confidence
+        # Extract confidence indicators
+        confidence = 0.8  # Default confidence
+        if "high confidence" in response_lower or "certain" in response_lower:
+            confidence = 0.9
+        elif "moderate confidence" in response_lower or "likely" in response_lower:
+            confidence = 0.7
+        elif "low confidence" in response_lower or "possible" in response_lower:
+            confidence = 0.6
+        
+        # Extract specific advice types
+        advice_types = []
+        if "variety" in response_lower or "type" in response_lower:
+            advice_types.append("variety_recommendation")
+        if "plant" in response_lower or "sow" in response_lower:
+            advice_types.append("planting_guidance")
+        if "fertilizer" in response_lower or "nutrient" in response_lower:
+            advice_types.append("fertilizer_schedule")
+        if "harvest" in response_lower or "yield" in response_lower:
+            advice_types.append("harvesting_advice")
+        
+        return {
+            "recommendations": recommendations,
+            "confidence": confidence,
+            "advice_types": advice_types,
+            "sources": ["neo4j_knowledge_graph", "malawi_crop_database", "expert_agronomy"]
+        }

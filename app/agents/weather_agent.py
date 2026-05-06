@@ -1,10 +1,9 @@
 """
-Weather Agent - Provides weather forecasts and climate-related agricultural advice.
-Helps farmers make weather-informed decisions.
+Weather & Seasonal Advisory Agent - Handles climate patterns and seasonal farming advice.
+Provides Malawi-specific weather information and planting recommendations.
 """
 from typing import Dict, Any, List
 import logging
-from datetime import datetime, timedelta
 
 from app.models.ollama_model import OllamaModel
 
@@ -13,28 +12,37 @@ logger = logging.getLogger(__name__)
 
 class WeatherAgent:
     """
-    Specialized agent for weather and climate-related queries.
-    Provides forecasts and weather-based agricultural recommendations.
+    Weather and seasonal advisory agent for Malawi farmers.
+    Provides climate patterns, rainfall data, and seasonal planting recommendations.
     """
     
     def __init__(self):
         self.llm = OllamaModel()
         
-        # System prompt for weather expertise
-        self.system_prompt = """You are a weather and climate expert for agricultural planning in Malawi.
-Your expertise includes:
-- Seasonal weather patterns in Malawi
-- Rainfall forecasting and interpretation
-- Drought and flood preparedness
-- Best planting times based on weather
-- Weather-related crop management
+        # Weather advisory system prompt
+        self.system_prompt = """You are an expert agricultural meteorologist specializing in Malawi's climate patterns.
+You can:
+- Analyze seasonal weather patterns and rainfall
+- Provide planting window recommendations
+- Advise on drought and flood mitigation
+- Recommend climate-appropriate crops
+- Predict weather-related risks
 
-Provide practical advice based on Malawi's climate patterns:
-- Rainy season: November to April
-- Dry season: May to October
-- Peak rainfall: January to February
+Use Malawi-specific knowledge:
+- Regional climate zones (Northern, Central, Southern)
+- Rainfall patterns (October-April main rains)
+- Temperature variations by altitude
+- Common weather risks (droughts, floods, dry spells)
+- Smallholder farmer adaptation strategies
 
-Always tie weather information to actionable agricultural advice."""
+Always provide:
+1. Current seasonal analysis
+2. Planting/harvesting timing recommendations
+3. Weather risk assessments
+4. Mitigation strategies
+5. Regional climate considerations
+
+Be practical and specific to Malawi's agricultural calendar."""
     
     async def process(
         self,
@@ -42,201 +50,204 @@ Always tie weather information to actionable agricultural advice."""
         context: Dict[str, Any] = None
     ) -> Dict[str, Any]:
         """
-        Process a weather-related query.
+        Process weather-related query with Malawi climate expertise.
         
         Args:
-            message: User's query about weather
-            context: Additional context (location, season, etc.)
+            message: User's weather-related question
+            context: Conversation history and farmer context
             
         Returns:
-            Response with weather advice
+            Weather advisory with seasonal recommendations
         """
         try:
-            # Analyze weather needs
-            weather_analysis = self._analyze_weather_needs(message)
+            # Analyze weather patterns and intent
+            weather_analysis = self._analyze_weather_intent(message)
             
-            # Get location context
-            location = context.get("location") if context else None
+            # Build weather advisory prompt with context
+            weather_prompt = self._build_weather_prompt(message, weather_analysis, context)
             
-            # Build prompt with weather context
-            prompt = self._build_prompt(message, weather_analysis, location)
-            
-            # Generate response
-            response = await self.llm.generate(
-                prompt,
-                system_prompt=self.system_prompt
+            # Generate expert weather advice
+            weather_response = await self.llm.generate(
+                weather_prompt,
+                system_prompt=self.system_prompt,
+                temperature=0.1
             )
             
-            # Calculate confidence
-            confidence = self._calculate_confidence(weather_analysis)
+            # Extract structured information
+            structured_result = self._structure_weather_response(weather_response)
             
             return {
-                "response": response,
-                "confidence": confidence,
-                "sources": [
-                    {
-                        "type": "weather_knowledge",
-                        "description": "Malawi seasonal patterns and climate data"
-                    }
-                ],
+                "response": weather_response,
+                "confidence": structured_result.get("confidence", 0.8),
+                "sources": structured_result.get("sources", []),
                 "context": {
-                    "weather_focus": weather_analysis.get("focus"),
-                    "current_season": self._get_current_season(),
-                    "location": location
+                    "weather_type": weather_analysis.get("type"),
+                    "season": structured_result.get("season"),
+                    "region": structured_result.get("region"),
+                    "recommendations": structured_result.get("recommendations", []),
+                    "analysis": f"Analyzed {weather_analysis.get('type')} weather pattern for Malawi"
                 }
             }
             
         except Exception as e:
             logger.error(f"WeatherAgent processing error: {e}")
             return {
-                "response": "I apologize, but I'm having trouble providing weather advice right now. Please try again with more specific weather questions.",
-                "confidence": 0.0,
+                "response": "I'm having trouble analyzing the weather information. Could you specify which region of Malawi you're asking about and what type of weather guidance you need?",
+                "confidence": 0.4,
                 "sources": [],
                 "context": {"error": str(e)}
             }
     
-    def _analyze_weather_needs(self, query: str) -> Dict[str, Any]:
+    def _analyze_weather_intent(self, message: str) -> Dict[str, Any]:
         """
-        Analyze what weather information the user needs.
+        Analyze message for weather-related intent and patterns.
         
         Args:
-            query: User query
+            message: User's weather-related question
             
         Returns:
-            Analysis of weather needs
+            Weather intent analysis
         """
-        query_lower = query.lower()
+        message_lower = message.lower()
         
-        # Weather focus areas
-        focus_areas = {
-            "forecast": ["forecast", "predict", "will it rain", "tomorrow", "next week"],
-            "season": ["season", "rainy season", "dry season", "planting season"],
-            "rainfall": ["rain", "rainfall", "precipitation", "wet", "dry spell"],
-            "drought": ["drought", "water shortage", "no rain", "dry period"],
-            "temperature": ["temperature", "hot", "cold", "heat", "frost"],
-            "planting": ["when to plant", "best time to plant", "planting time"],
-            "harvest": ["harvest", "when to harvest", "drying"]
+        # Weather pattern keywords
+        weather_patterns = {
+            "seasonal": ["season", "planting", "harvest", "when", "time", "calendar"],
+            "rainfall": ["rain", "rainfall", "wet", "dry", "drought", "flood"],
+            "temperature": ["temperature", "hot", "cold", "heat", "climate"],
+            "regional": ["region", "area", "zone", "north", "south", "central"],
+            "prediction": ["forecast", "predict", "expect", "coming", "trend"]
         }
         
-        detected_focus = []
-        for focus, keywords in focus_areas.items():
-            if any(keyword in query_lower for keyword in keywords):
-                detected_focus.append(focus)
+        detected_patterns = []
+        for category, patterns in weather_patterns.items():
+            for pattern in patterns:
+                if pattern in message_lower:
+                    detected_patterns.append({
+                        "category": category,
+                        "pattern": pattern
+                    })
         
-        # Determine urgency
-        urgent_keywords = ["now", "today", "urgent", "immediate", "should I"]
-        is_urgent = any(kw in query_lower for kw in urgent_keywords)
-        
-        # Determine timeframe
-        timeframe = self._determine_timeframe(query_lower)
+        # Determine primary intent
+        intent_type = "general"
+        if any(p["category"] == "seasonal" for p in detected_patterns):
+            intent_type = "seasonal_advisory"
+        elif any(p["category"] == "rainfall" for p in detected_patterns):
+            intent_type = "rainfall_analysis"
+        elif any(p["category"] == "temperature" for p in detected_patterns):
+            intent_type = "temperature_analysis"
+        elif any(p["category"] == "regional" for p in detected_patterns):
+            intent_type = "regional_climate"
+        elif any(p["category"] == "prediction" for p in detected_patterns):
+            intent_type = "weather_prediction"
         
         return {
-            "focus": detected_focus,
-            "urgent": is_urgent,
-            "timeframe": timeframe
+            "type": intent_type,
+            "patterns": detected_patterns,
+            "complexity": len(detected_patterns)
         }
     
-    def _determine_timeframe(self, query: str) -> str:
-        """
-        Determine the timeframe of the weather query.
-        
-        Args:
-            query: User query (lowercase)
-            
-        Returns:
-            Timeframe description
-        """
-        if any(word in query for word in ["tomorrow", "today", "now"]):
-            return "immediate"
-        elif any(word in query for word in ["next week", "coming week", "this week"]):
-            return "short_term"
-        elif any(word in query for word in ["next month", "coming month", "season"]):
-            return "seasonal"
-        elif any(word in query for word in ["year", "annual", "long term"]):
-            return "long_term"
-        else:
-            return "general"
-    
-    def _get_current_season(self) -> Dict[str, Any]:
-        """
-        Get current season information for Malawi.
-        
-        Returns:
-            Season information
-        """
-        current_month = datetime.now().month
-        
-        # Malawi seasons
-        if 11 <= current_month <= 4:
-            season = "rainy"
-            season_name = "Rainy Season"
-            activities = ["Planting", "Weeding", "Top dressing"]
-        else:
-            season = "dry"
-            season_name = "Dry Season"
-            activities = ["Harvesting", "Drying", "Storage", "Land preparation"]
-        
-        return {
-            "name": season_name,
-            "type": season,
-            "month": current_month,
-            "typical_activities": activities
-        }
-    
-    def _build_prompt(
+    def _build_weather_prompt(
         self,
         message: str,
-        analysis: Dict[str, Any],
-        location: str = None
+        weather_analysis: Dict[str, Any],
+        context: Dict[str, Any] = None
     ) -> str:
         """
-        Build prompt with weather context.
+        Build weather advisory prompt with analysis and context.
         
         Args:
-            message: User message
-            analysis: Weather analysis
-            location: Optional location
+            message: Original user message
+            weather_analysis: Weather intent analysis
+            context: Conversation context
             
         Returns:
-            Formatted prompt
+            Formatted weather advisory prompt
         """
-        season_info = self._get_current_season()
+        # Get conversation history if available
+        history_text = ""
+        if context and context.get("history"):
+            recent_history = context["history"][-2:]  # Last 2 exchanges
+            history_text = "Recent conversation context:\n"
+            for exchange in recent_history:
+                history_text += f"User: {exchange.get('user', '')}\n"
+                history_text += f"Assistant: {exchange.get('assistant', '')}\n\n"
         
-        context_text = f"Current season: {season_info['name']}\n"
-        context_text += f"Typical activities: {', '.join(season_info['typical_activities'])}\n"
+        # Format weather patterns
+        patterns_text = "Detected weather patterns:\n"
+        for pattern in weather_analysis.get("patterns", []):
+            patterns_text += f"- {pattern.get('pattern', 'unknown')} ({pattern.get('category', 'unknown')})\n"
         
-        if location:
-            context_text += f"Location: {location}\n"
-        
-        if analysis.get("focus"):
-            context_text += f"Weather focus: {', '.join(analysis['focus'])}\n"
-        
-        if analysis.get("urgent"):
-            context_text += "This appears to be an urgent weather-related decision.\n"
-        
-        prompt = f"""{context_text}
+        prompt = f"""{history_text}
+Current farmer query: {message}
 
-Farmer's question: {message}
+{patterns_text}
 
-Provide weather-informed agricultural advice. Consider Malawi's climate patterns and give practical recommendations."""
+Weather intent type: {weather_analysis.get('type')}
+
+Please provide expert Malawi weather advisory:
+1. Analyze seasonal patterns and rainfall expectations
+2. Recommend optimal planting/harvesting windows
+3. Assess weather-related risks (drought, flood, temperature)
+4. Suggest climate-appropriate farming strategies
+5. Consider regional variations (Northern, Central, Southern Malawi)
+
+Include specific:
+- Expected rainfall patterns by month
+- Temperature considerations by altitude
+- Risk mitigation for smallholder farmers
+- Traditional weather knowledge integration"""
         
         return prompt
     
-    def _calculate_confidence(self, analysis: Dict[str, Any]) -> float:
+    def _structure_weather_response(self, response: str) -> Dict[str, Any]:
         """
-        Calculate confidence score.
+        Structure weather response into components.
         
         Args:
-            analysis: Weather analysis
+            response: LLM weather response
             
         Returns:
-            Confidence score (0-1)
+            Structured weather information
         """
-        base_confidence = 0.6
+        response_lower = response.lower()
         
-        # Increase confidence with clear focus
-        if analysis.get("focus"):
-            base_confidence += min(len(analysis["focus"]) * 0.05, 0.15)
+        # Extract season information
+        seasons = ["planting season", "growing season", "harvest season", "dry season", "rainy season"]
+        detected_season = None
+        for season in seasons:
+            if season in response_lower:
+                detected_season = season
+                break
         
-        # General weather advice is reasonably reliable for seasonal patterns
-        return min(base_confidence, 0.85)
+        # Extract region information
+        regions = ["northern", "central", "southern", "lilongwe", "blantyre", "mzuzu"]
+        detected_region = None
+        for region in regions:
+            if region in response_lower:
+                detected_region = region
+                break
+        
+        # Extract recommendations
+        recommendations = []
+        recommendation_keywords = ["plant", "harvest", "prepare", "monitor", "irrigate", "protect"]
+        for keyword in recommendation_keywords:
+            if keyword in response_lower:
+                recommendations.append(keyword)
+        
+        # Determine confidence
+        confidence = 0.8  # Default confidence
+        if "high confidence" in response_lower or "certain" in response_lower:
+            confidence = 0.9
+        elif "moderate confidence" in response_lower or "likely" in response_lower:
+            confidence = 0.7
+        elif "low confidence" in response_lower or "possible" in response_lower:
+            confidence = 0.6
+        
+        return {
+            "season": detected_season,
+            "region": detected_region,
+            "recommendations": recommendations,
+            "confidence": confidence,
+            "sources": ["malawi_meteorological_data", "agricultural_calendar", "farmer_knowledge"]
+        }

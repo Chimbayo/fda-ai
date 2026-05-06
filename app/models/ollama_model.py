@@ -113,7 +113,7 @@ class OllamaModel:
             cache_key = self._get_cache_key(prompt, system_prompt, temp)
             if cache_key in _response_cache:
                 logger.debug(f"Cache hit: {cache_key[:8]}...")
-                return _response_cache[cache_key]
+                yield _response_cache[cache_key]
         
         # Use prompt directly for now (compression disabled for stability)
         compressed_prompt = prompt

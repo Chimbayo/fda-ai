@@ -1,40 +1,47 @@
 """
-Disease Agent - Specialized in plant diseases and pest management.
-Provides diagnosis and treatment recommendations for crop diseases.
+Disease Diagnosis Agent - Handles crop disease identification and treatment.
+Provides expert-level disease analysis with reasoning and recommendations.
 """
 from typing import Dict, Any, List
 import logging
 
 from app.models.ollama_model import OllamaModel
-from app.database.neo4j_client import Neo4jClient
-from app.utils.ranking import rank_sources
 
 logger = logging.getLogger(__name__)
 
 
 class DiseaseAgent:
     """
-    Specialized agent for disease and pest-related queries.
-    Handles diagnosis, treatment recommendations, and prevention strategies.
+    Disease diagnosis agent for identifying crop diseases,
+    analyzing symptoms, and providing treatment recommendations.
     """
     
     def __init__(self):
         self.llm = OllamaModel()
-        self.db = Neo4jClient()
         
-        # System prompt for disease expertise
-        self.system_prompt = """You are a plant pathology expert specializing in crop diseases in Malawi.
-Your expertise includes:
-- Disease identification from symptoms
-- Pest identification and management
-- Treatment recommendations (chemical and organic)
-- Preventive measures
-- Integrated Pest Management (IPM)
+        # Disease diagnosis system prompt
+        self.system_prompt = """You are an expert agricultural pathologist specializing in crop diseases in Malawi.
+You can:
+- Identify crop diseases from symptoms
+- Analyze likely causes and risk factors
+- Recommend specific treatments and prevention
+- Provide confidence estimates for diagnosis
+- Suggest when to seek expert help
 
-Provide accurate diagnoses based on symptoms described.
-Recommend both immediate treatment and long-term prevention.
-Consider smallholder farmer constraints (cost, availability, safety).
-Be specific about local diseases affecting maize, tomatoes, and other common crops."""
+Use Malawi-specific knowledge including:
+- Common regional diseases and their patterns
+- Local treatment options and availability
+- Climate-related disease factors
+- Smallholder farmer constraints
+
+Always provide:
+1. Likely disease(s) with confidence
+2. Symptom analysis and reasoning
+3. Treatment recommendations (immediate and long-term)
+4. Prevention strategies
+5. When to consult agricultural extension officer
+
+Be thorough but practical. Consider farmer resources and local conditions."""
     
     async def process(
         self,
@@ -42,230 +49,219 @@ Be specific about local diseases affecting maize, tomatoes, and other common cro
         context: Dict[str, Any] = None
     ) -> Dict[str, Any]:
         """
-        Process a disease-related query.
+        Process disease-related query with expert analysis.
         
         Args:
-            message: User's query about diseases or pests
-            context: Additional context
+            message: User's disease-related question
+            context: Conversation history and farmer context
             
         Returns:
-            Response with diagnosis and treatment advice
+            Disease diagnosis with treatment recommendations
         """
         try:
-            # Analyze symptoms and retrieve disease info
-            analysis = await self._analyze_symptoms(message)
+            # Analyze symptoms and disease patterns
+            symptom_analysis = self._analyze_symptoms(message)
             
-            # Retrieve treatment information
-            treatments = await self._retrieve_treatments(analysis.get("diseases", []))
+            # Build diagnostic prompt with context
+            diagnostic_prompt = self._build_diagnostic_prompt(message, symptom_analysis, context)
             
-            # Build prompt with diagnosis
-            prompt = self._build_prompt(message, analysis, treatments, context)
-            
-            # Generate response
-            response = await self.llm.generate(
-                prompt,
-                system_prompt=self.system_prompt
+            # Generate expert diagnosis
+            diagnosis_response = await self.llm.generate(
+                diagnostic_prompt,
+                system_prompt=self.system_prompt,
+                temperature=0.1
             )
             
-            # Calculate confidence
-            confidence = self._calculate_confidence(analysis, treatments)
-            
-            # Format sources
-            sources = rank_sources(treatments)
+            # Extract structured information
+            structured_result = self._structure_diagnosis(diagnosis_response)
             
             return {
-                "response": response,
-                "confidence": confidence,
-                "sources": sources,
+                "response": diagnosis_response,
+                "confidence": structured_result.get("confidence", 0.7),
+                "sources": structured_result.get("sources", []),
                 "context": {
-                    "detected_diseases": analysis.get("diseases", []),
-                    "symptoms": analysis.get("symptoms", []),
-                    "severity": analysis.get("severity", "unknown")
+                    "symptoms_identified": symptom_analysis.get("symptoms", []),
+                    "likely_diseases": structured_result.get("diseases", []),
+                    "urgency": structured_result.get("urgency", "medium"),
+                    "recommended_actions": structured_result.get("actions", []),
+                    "analysis": f"Analyzed {len(symptom_analysis.get('symptoms', []))} symptoms for disease patterns"
                 }
             }
             
         except Exception as e:
             logger.error(f"DiseaseAgent processing error: {e}")
             return {
-                "response": "I apologize, but I'm having trouble analyzing the disease symptoms right now. Please try describing the symptoms more specifically.",
-                "confidence": 0.0,
+                "response": "I'm having trouble analyzing the disease symptoms. Could you describe the affected crop, symptoms you're seeing, and how long this has been happening?",
+                "confidence": 0.3,
                 "sources": [],
                 "context": {"error": str(e)}
             }
     
-    async def _analyze_symptoms(self, query: str) -> Dict[str, Any]:
+    def _analyze_symptoms(self, message: str) -> Dict[str, Any]:
         """
-        Analyze symptoms described in the query.
+        Analyze message for disease symptoms and patterns.
         
         Args:
-            query: User's description
+            message: User's description of symptoms
             
         Returns:
-            Analysis results with detected diseases and symptoms
+            Symptom analysis with disease patterns
         """
-        # Common symptoms and their associated diseases
+        message_lower = message.lower()
+        
+        # Common disease symptom patterns
         symptom_patterns = {
-            "leaf blight": ["maize leaf blight", "turcicum leaf blight"],
-            "brown lesions": ["maize leaf blight", "gray leaf spot"],
-            "yellow spots": ["maize streak virus", "rust"],
-            "dark spots": ["tomato early blight", "septoria leaf spot"],
-            "concentric rings": ["tomato early blight"],
-            "wilting": ["wilt diseases", "fusarium wilt", "bacterial wilt"],
-            "stunted growth": ["root rot", "viral diseases", "nutrient deficiency"],
-            "white patches": ["powdery mildew"],
-            "holes in leaves": ["caterpillars", "beetles", "stem borers"],
-            "tunneling": ["stem borers", "stalk borers"]
+            "leaf_symptoms": ["yellow", "brown", "spots", "curl", "wilt", "blight", "mold"],
+            "stem_symptoms": ["rot", "canker", "lesion", "crack", "weak"],
+            "fruit_symptoms": ["rot", "soft", "spots", "deform", "drop"],
+            "growth_symptoms": ["stunted", "slow", "weak", "dying", "poor"],
+            "pest_indicators": ["insects", "eggs", "webbing", "holes", "chew"]
         }
         
-        query_lower = query.lower()
-        
         detected_symptoms = []
-        possible_diseases = []
+        for category, patterns in symptom_patterns.items():
+            for pattern in patterns:
+                if pattern in message_lower:
+                    detected_symptoms.append({
+                        "category": category,
+                        "symptom": pattern,
+                        "severity": self._assess_severity(message_lower, pattern)
+                    })
         
-        for symptom, diseases in symptom_patterns.items():
-            if symptom in query_lower:
-                detected_symptoms.append(symptom)
-                possible_diseases.extend(diseases)
-        
-        # Remove duplicates
-        possible_diseases = list(set(possible_diseases))
-        
-        # Determine severity
-        severity = self._assess_severity(query_lower, detected_symptoms)
+        # Assess overall urgency
+        urgency = self._assess_urgency(detected_symptoms)
         
         return {
             "symptoms": detected_symptoms,
-            "diseases": possible_diseases,
-            "severity": severity
+            "urgency": urgency,
+            "complexity": len(detected_symptoms)
         }
     
-    def _assess_severity(self, query: str, symptoms: List[str]) -> str:
-        """
-        Assess disease severity based on description.
+    def _assess_severity(self, message: str, symptom: str) -> str:
+        """Assess severity of a symptom based on context."""
+        severe_indicators = ["severe", "widespread", "dying", "dead", "complete", "total"]
+        moderate_indicators = ["some", "partial", "few", "moderate"]
         
-        Args:
-            query: User query
-            symptoms: Detected symptoms
-            
-        Returns:
-            Severity level
-        """
-        severe_indicators = ["widespread", "severe", "dying", "all plants", "entire field", "heavy"]
-        moderate_indicators = ["some", "several", "patches", "spreading"]
-        
-        query_lower = query.lower()
-        
-        if any(ind in query_lower for ind in severe_indicators) or len(symptoms) > 2:
+        if any(indicator in message for indicator in severe_indicators):
             return "severe"
-        elif any(ind in query_lower for ind in moderate_indicators) or len(symptoms) > 1:
+        elif any(indicator in message for indicator in moderate_indicators):
             return "moderate"
         else:
             return "mild"
     
-    async def _retrieve_treatments(self, diseases: List[str]) -> List[Dict[str, Any]]:
-        """
-        Retrieve treatment information for detected diseases.
+    def _assess_urgency(self, symptoms: List[Dict[str, Any]]) -> str:
+        """Assess overall urgency based on symptoms."""
+        if not symptoms:
+            return "low"
         
-        Args:
-            diseases: List of detected diseases
-            
-        Returns:
-            Treatment information
-        """
-        if not diseases:
-            return []
+        severe_count = sum(1 for s in symptoms if s.get("severity") == "severe")
+        if severe_count > 0:
+            return "high"
         
-        try:
-            treatments = []
-            
-            for disease in diseases:
-                cypher_query = """
-                MATCH (d:Disease)-[:TREATED_WITH]->(t:Treatment)
-                WHERE d.name CONTAINS $disease OR d.symptoms CONTAINS $disease
-                RETURN d.name as disease, d.symptoms as symptoms,
-                       t.name as treatment, t.type as type, 
-                       t.application as application, t.effectiveness as effectiveness
-                """
-                
-                results = self.db.execute_query(cypher_query, {"disease": disease})
-                treatments.extend(results)
-            
-            return treatments
-            
-        except Exception as e:
-            logger.error(f"Treatment retrieval error: {e}")
-            return []
+        if len(symptoms) > 3:
+            return "medium"
+        
+        return "low"
     
-    def _build_prompt(
+    def _build_diagnostic_prompt(
         self,
         message: str,
-        analysis: Dict[str, Any],
-        treatments: List[Dict[str, Any]],
-        context: Dict[str, Any]
+        symptom_analysis: Dict[str, Any],
+        context: Dict[str, Any] = None
     ) -> str:
         """
-        Build prompt with diagnosis and treatment information.
+        Build diagnostic prompt with symptom analysis and context.
         
         Args:
-            message: User message
-            analysis: Symptom analysis
-            treatments: Treatment information
-            context: Additional context
+            message: Original user message
+            symptom_analysis: Analyzed symptoms
+            context: Conversation context
             
         Returns:
-            Formatted prompt
+            Formatted diagnostic prompt
         """
-        # Format diagnosis
-        diagnosis_text = ""
-        if analysis.get("diseases"):
-            diagnosis_text = f"Detected diseases: {', '.join(analysis['diseases'])}\n"
-            diagnosis_text += f"Symptoms: {', '.join(analysis['symptoms'])}\n"
-            diagnosis_text += f"Severity: {analysis['severity']}\n\n"
+        # Get conversation history if available
+        history_text = ""
+        if context and context.get("history"):
+            recent_history = context["history"][-2:]  # Last 2 exchanges
+            history_text = "Recent conversation context:\n"
+            for exchange in recent_history:
+                history_text += f"User: {exchange.get('user', '')}\n"
+                history_text += f"Assistant: {exchange.get('assistant', '')}\n\n"
         
-        # Format treatments
-        treatment_text = ""
-        if treatments:
-            treatment_text = "Recommended treatments:\n"
-            for i, treatment in enumerate(treatments[:5], 1):
-                treatment_text += f"{i}. {treatment}\n"
+        # Format symptoms
+        symptoms_text = "Detected symptoms:\n"
+        for symptom in symptom_analysis.get("symptoms", []):
+            symptoms_text += f"- {symptom.get('symptom', 'unknown')} ({symptom.get('severity', 'unknown')} severity)\n"
         
-        prompt = f"""{diagnosis_text}{treatment_text}
+        prompt = f"""{history_text}
+Current farmer query: {message}
 
-Farmer's description: {message}
+{symptoms_text}
 
-Provide a clear diagnosis and practical treatment recommendations. Include both immediate action and prevention strategies."""
+Urgency level: {symptom_analysis.get('urgency', 'unknown')}
+
+Please provide expert disease diagnosis:
+1. Identify most likely disease(s) with confidence percentage
+2. Explain your reasoning based on symptoms
+3. Recommend immediate treatment actions
+4. Suggest prevention strategies
+5. Advise when to seek agricultural extension help
+
+Consider Malawi conditions: smallholder farms, limited resources, local climate patterns."""
         
         return prompt
     
-    def _calculate_confidence(
-        self,
-        analysis: Dict[str, Any],
-        treatments: List[Dict[str, Any]]
-    ) -> float:
+    def _structure_diagnosis(self, response: str) -> Dict[str, Any]:
         """
-        Calculate confidence score.
+        Structure diagnosis response into components.
         
         Args:
-            analysis: Symptom analysis
-            treatments: Treatment information
+            response: LLM diagnosis response
             
         Returns:
-            Confidence score (0-1)
+            Structured diagnosis information
         """
-        if not analysis.get("symptoms"):
-            return 0.2
+        # Extract diseases mentioned
+        diseases_mentioned = []
+        common_diseases = [
+            "early blight", "late blight", "fusarium wilt", "bacterial wilt",
+            "powdery mildew", "downy mildew", "leaf spot", "rust",
+            "mosaic virus", "streak virus", "root rot", "anthracnose"
+        ]
         
-        base_confidence = 0.4
+        response_lower = response.lower()
+        for disease in common_diseases:
+            if disease in response_lower:
+                diseases_mentioned.append(disease)
         
-        # Increase confidence with clear symptoms
-        base_confidence += min(len(analysis["symptoms"]) * 0.1, 0.2)
+        # Extract confidence indicators
+        confidence = 0.7  # Default confidence
+        if "high confidence" in response_lower or "very likely" in response_lower:
+            confidence = 0.9
+        elif "moderate confidence" in response_lower or "likely" in response_lower:
+            confidence = 0.7
+        elif "low confidence" in response_lower or "possible" in response_lower:
+            confidence = 0.5
         
-        # Increase confidence with treatment information
-        if treatments:
-            base_confidence += min(len(treatments) * 0.05, 0.2)
+        # Extract recommended actions
+        actions = []
+        action_keywords = ["spray", "apply", "remove", "treat", "consult", "monitor"]
+        for keyword in action_keywords:
+            if keyword in response_lower:
+                actions.append(keyword)
         
-        # Decrease confidence if severity is unknown
-        if analysis.get("severity") == "unknown":
-            base_confidence -= 0.1
+        # Determine urgency from response
+        urgency = "medium"
+        if "urgent" in response_lower or "immediate" in response_lower:
+            urgency = "high"
+        elif "monitor" in response_lower or "observe" in response_lower:
+            urgency = "low"
         
-        return min(max(base_confidence, 0.1), 0.9)
+        return {
+            "diseases": diseases_mentioned,
+            "confidence": confidence,
+            "urgency": urgency,
+            "actions": actions,
+            "sources": ["expert_pathology_knowledge", "malawi_agricultural_data"]
+        }

@@ -1,38 +1,51 @@
 """
-Retrieval Agent - Searches and retrieves information from research papers and documents.
-Provides evidence-based answers from the knowledge base.
+Knowledge Retrieval Agent - Handles graph-based search and ranking.
+Provides intelligent retrieval from Neo4j with citation generation.
 """
 from typing import Dict, Any, List
 import logging
 
 from app.models.ollama_model import OllamaModel
 from app.database.neo4j_client import Neo4jClient
-from app.utils.ranking import rank_sources
 
 logger = logging.getLogger(__name__)
 
 
 class RetrievalAgent:
     """
-    Specialized agent for retrieving information from research documents.
-    Handles queries requiring technical information, studies, and papers.
+    Knowledge retrieval agent for graph-based search,
+    ranking, and citation generation from Neo4j.
     """
     
     def __init__(self):
         self.llm = OllamaModel()
-        self.db = Neo4jClient()
+        self.neo4j = Neo4jClient()
         
-        # System prompt for research expertise
-        self.system_prompt = """You are a research librarian and technical expert for agricultural studies.
-Your expertise includes:
-- Finding relevant research papers and studies
-- Extracting key findings from technical documents
-- Summarizing complex research for farmers
-- Citing sources and providing evidence-based answers
+        # Retrieval system prompt
+        self.system_prompt = """You are an expert knowledge manager for Malawi's agricultural database.
+You can:
+- Search and retrieve agricultural knowledge from Neo4j graph
+- Rank information by relevance and confidence
+- Generate proper citations for sources
+- Provide context-aware search results
+- Cross-reference multiple knowledge sources
 
-Focus on practical applications of research findings.
-Be accurate about study details, authors, and key conclusions.
-Clearly distinguish between established research and preliminary findings."""
+Use Neo4j knowledge including:
+- Crop varieties and their characteristics
+- Disease and pest information
+- Fertilizer recommendations
+- Farming methods and best practices
+- Research findings and expert advice
+- Regional agricultural data
+
+Always provide:
+1. Relevant knowledge with confidence scores
+2. Proper citations and source attribution
+3. Ranked results by relevance
+4. Cross-references between related entities
+5. Contextual explanations for farmers
+
+Be thorough and cite sources properly. Consider Malawi's agricultural context."""
     
     async def process(
         self,
@@ -40,282 +53,327 @@ Clearly distinguish between established research and preliminary findings."""
         context: Dict[str, Any] = None
     ) -> Dict[str, Any]:
         """
-        Process a retrieval query.
+        Process knowledge retrieval query with graph-based search.
         
         Args:
-            message: User's query about research/documents
-            context: Additional context
+            message: User's knowledge query
+            context: Conversation history and farmer context
             
         Returns:
-            Response with retrieved information
+            Retrieved knowledge with rankings and citations
         """
         try:
-            # Search for relevant documents
-            documents = await self._search_documents(message)
+            # Analyze query for retrieval strategy
+            query_analysis = self._analyze_query(message)
             
-            # Extract key information
-            key_findings = await self._extract_findings(documents, message)
+            # Retrieve relevant knowledge from Neo4j
+            neo4j_results = await self._retrieve_knowledge(query_analysis)
             
-            # Build prompt with retrieved information
-            prompt = self._build_prompt(message, documents, key_findings)
+            # Rank and filter results
+            ranked_results = self._rank_results(neo4j_results, query_analysis)
             
-            # Generate synthesized response
-            response = await self.llm.generate(
-                prompt,
-                system_prompt=self.system_prompt
+            # Build retrieval prompt with context
+            retrieval_prompt = self._build_retrieval_prompt(message, query_analysis, ranked_results, context)
+            
+            # Generate intelligent retrieval response
+            retrieval_response = await self.llm.generate(
+                retrieval_prompt,
+                system_prompt=self.system_prompt,
+                temperature=0.1
             )
             
-            # Calculate confidence based on document quality
-            confidence = self._calculate_confidence(documents, key_findings)
-            
-            # Format sources
-            sources = self._format_sources(documents)
+            # Extract structured information
+            structured_result = self._structure_retrieval_response(retrieval_response, ranked_results)
             
             return {
-                "response": response,
-                "confidence": confidence,
-                "sources": sources,
+                "response": retrieval_response,
+                "confidence": structured_result.get("confidence", 0.8),
+                "sources": structured_result.get("citations", []),
                 "context": {
-                    "documents_found": len(documents),
-                    "search_terms": self._extract_search_terms(message)
+                    "query_type": query_analysis.get("type"),
+                    "entities_found": query_analysis.get("entities", []),
+                    "results_count": len(ranked_results),
+                    "top_results": ranked_results[:3],
+                    "analysis": f"Retrieved {len(ranked_results)} results for {query_analysis.get('type')} query"
                 }
             }
             
         except Exception as e:
             logger.error(f"RetrievalAgent processing error: {e}")
             return {
-                "response": "I apologize, but I'm having trouble retrieving the research information you requested. Please try a more specific query about agricultural research.",
-                "confidence": 0.0,
+                "response": "I'm having trouble retrieving knowledge from the database. Could you specify what information you're looking for?",
+                "confidence": 0.4,
                 "sources": [],
                 "context": {"error": str(e)}
             }
     
-    async def _search_documents(self, query: str) -> List[Dict[str, Any]]:
+    def _analyze_query(self, message: str) -> Dict[str, Any]:
         """
-        Search for relevant documents in the knowledge base.
+        Analyze query for retrieval strategy and entity extraction.
         
         Args:
-            query: Search query
+            message: User's knowledge query
             
         Returns:
-            List of relevant documents
+            Query analysis with entities and strategy
         """
-        search_terms = self._extract_search_terms(query)
+        message_lower = message.lower()
         
-        documents = []
+        # Query type patterns
+        query_patterns = {
+            "entity_search": ["what is", "tell me about", "information on", "details of"],
+            "relationship_search": ["how does", "relate to", "connect to", "affect"],
+            "comparison": ["compare", "difference", "better", "versus"],
+            "research_search": ["research", "study", "paper", "finding", "data"]
+        }
         
+        detected_pattern = None
+        for pattern_type, patterns in query_patterns.items():
+            if any(pattern in message_lower for pattern in patterns):
+                detected_pattern = pattern_type
+                break
+        
+        # Extract entities
+        entities = self._extract_entities(message_lower)
+        
+        # Determine search strategy
+        search_strategy = "entity_based"
+        if entities:
+            search_strategy = "entity_based"
+        elif detected_pattern == "relationship_search":
+            search_strategy = "relationship_based"
+        elif detected_pattern == "comparison":
+            search_strategy = "comparison_based"
+        else:
+            search_strategy = "general_search"
+        
+        return {
+            "type": detected_pattern or "general_search",
+            "entities": entities,
+            "strategy": search_strategy,
+            "complexity": len(entities)
+        }
+    
+    def _extract_entities(self, message: str) -> List[str]:
+        """Extract agricultural entities from message."""
+        entities = []
+        
+        # Crop entities
+        crops = ["maize", "tomato", "cabbage", "groundnut", "soybean", "tobacco", "cassava", "rice"]
+        for crop in crops:
+            if crop in message:
+                entities.append(crop)
+        
+        # Disease entities
+        diseases = ["blight", "wilt", "mildew", "rot", "virus", "spot"]
+        for disease in diseases:
+            if disease in message:
+                entities.append(disease)
+        
+        # Treatment entities
+        treatments = ["fertilizer", "pesticide", "fungicide", "herbicide"]
+        for treatment in treatments:
+            if treatment in message:
+                entities.append(treatment)
+        
+        return list(set(entities))  # Remove duplicates
+    
+    async def _retrieve_knowledge(self, query_analysis: Dict[str, Any]) -> List[Dict[str, Any]]:
+        """
+        Retrieve relevant knowledge from Neo4j based on query analysis.
+        
+        Args:
+            query_analysis: Query analysis with entities
+            
+        Returns:
+            List of Neo4j results
+        """
         try:
-            # Search in Neo4j for documents
-            for term in search_terms:
-                cypher_query = """
-                MATCH (d:Document)
-                WHERE d.title CONTAINS $term 
-                   OR d.content CONTAINS $term
-                   OR d.keywords CONTAINS $term
-                RETURN d.id as id, d.title as title, d.author as author,
-                       d.year as year, d.abstract as abstract, d.content as content,
-                       d.source as source
+            entities = query_analysis.get("entities", [])
+            strategy = query_analysis.get("strategy", "general_search")
+            
+            if strategy == "entity_based" and entities:
+                # Entity-based search
+                results = []
+                for entity in entities:
+                    entity_query = """
+                    MATCH (n)
+                    WHERE n.name CONTAINS $entity OR n.type CONTAINS $entity
+                    OPTIONAL MATCH (n)-[r]->(related)
+                    RETURN n, r, labels(n)
+                    """
+                    
+                    entity_results = self.neo4j.execute_query(entity_query, {"entity": entity})
+                    results.extend(entity_results)
+                
+                return results
+            
+            elif strategy == "relationship_based":
+                # Relationship-based search
+                relationship_query = """
+                MATCH (a)-[r]->(b)
+                WHERE a.name CONTAINS $entity1 OR b.name CONTAINS $entity2
+                RETURN a, r, b, type(r)
+                """
+                
+                if len(entities) >= 2:
+                    results = self.neo4j.execute_query(relationship_query, {
+                        "entity1": entities[0],
+                        "entity2": entities[1]
+                    })
+                    return results
+            
+            else:
+                # General semantic search
+                general_query = """
+                MATCH (n)
+                WHERE n.name CONTAINS $query OR n.description CONTAINS $query
+                RETURN n, labels(n)
+                ORDER BY n.relevance DESC
                 LIMIT 10
                 """
                 
-                results = self.db.execute_query(cypher_query, {"term": term})
-                documents.extend(results)
-            
-            # Also search for specific topics
-            topic_query = """
-            MATCH (t:Topic)-[:DISCUSSED_IN]->(d:Document)
-            WHERE t.name CONTAINS $term
-            RETURN d.id as id, d.title as title, d.author as author,
-                   d.year as year, d.abstract as abstract, d.content as content,
-                   t.name as topic, d.source as source
-            LIMIT 10
-            """
-            
-            for term in search_terms:
-                results = self.db.execute_query(topic_query, {"term": term})
-                documents.extend(results)
-            
-            # Remove duplicates
-            seen_ids = set()
-            unique_documents = []
-            for doc in documents:
-                doc_id = doc.get("id") or doc.get("title", "")
-                if doc_id not in seen_ids:
-                    seen_ids.add(doc_id)
-                    unique_documents.append(doc)
-            
-            return unique_documents[:10]  # Return top 10
-            
+                query_text = " ".join(entities) if entities else "agricultural"
+                results = self.neo4j.execute_query(general_query, {"query": query_text})
+                return results
+                
         except Exception as e:
-            logger.error(f"Document search error: {e}")
+            logger.error(f"Neo4j retrieval error: {e}")
             return []
     
-    async def _extract_findings(
-        self,
-        documents: List[Dict[str, Any]],
-        query: str
-    ) -> List[Dict[str, Any]]:
+    def _rank_results(self, results: List[Dict[str, Any]], query_analysis: Dict[str, Any]) -> List[Dict[str, Any]]:
         """
-        Extract key findings relevant to the query.
+        Rank retrieval results by relevance and confidence.
         
         Args:
-            documents: Retrieved documents
-            query: Original query
+            results: Raw Neo4j results
+            query_analysis: Query analysis
             
         Returns:
-            Key findings
+            Ranked list of results
         """
-        findings = []
+        if not results:
+            return []
         
-        for doc in documents[:5]:  # Process top 5
-            try:
-                # Create extraction prompt
-                extraction_prompt = f"""Extract key findings from this research document that answer the following question:
-
-Question: {query}
-
-Document Title: {doc.get('title', 'Unknown')}
-Author: {doc.get('author', 'Unknown')}
-Year: {doc.get('year', 'Unknown')}
-
-Content:
-{doc.get('content', doc.get('abstract', ''))[:2000]}
-
-List 2-3 key findings that directly address the question. Be specific and quote important statistics or conclusions."""
-                
-                extraction = await self.llm.generate(extraction_prompt)
-                
-                findings.append({
-                    "document": doc.get("title"),
-                    "author": doc.get("author"),
-                    "year": doc.get("year"),
-                    "findings": extraction,
-                    "source": doc.get("source", "Research database")
-                })
-                
-            except Exception as e:
-                logger.error(f"Error extracting findings: {e}")
-                continue
+        # Calculate relevance scores
+        entities = query_analysis.get("entities", [])
+        strategy = query_analysis.get("strategy", "general_search")
         
-        return findings
-    
-    def _extract_search_terms(self, query: str) -> List[str]:
-        """
-        Extract relevant search terms from query.
-        
-        Args:
-            query: User query
+        for result in results:
+            score = 0.5  # Base score
             
-        Returns:
-            List of search terms
-        """
-        # Common research-related terms
-        research_terms = [
-            "maize", "efficiency", "farming", "agriculture", "productivity",
-            "technical", "study", "research", "analysis", "data",
-            "malawi", "smallholder", "soil fertility", "fertilizer",
-            "yield", "crop", "variety", "sustainability"
-        ]
+            # Entity matching bonus
+            if strategy == "entity_based":
+                result_entities = result.get("entities", [])
+                for entity in entities:
+                    if any(entity.lower() in str(result_entities).lower() for entity in entities):
+                        score += 0.3
+            
+            # Label relevance
+            labels = result.get("labels", [])
+            if "Crop" in labels:
+                score += 0.2
+            if "Disease" in labels or "Pest" in labels:
+                score += 0.2
+            if "Research" in labels:
+                score += 0.1
+            
+            result["relevance_score"] = score
         
-        query_lower = query.lower()
-        terms = [term for term in research_terms if term in query_lower]
+        # Sort by relevance score
+        ranked_results = sorted(results, key=lambda x: x.get("relevance_score", 0), reverse=True)
         
-        # If no terms found, extract all nouns (simplified)
-        if not terms:
-            words = query_lower.split()
-            terms = [w for w in words if len(w) > 4][:3]
-        
-        return terms if terms else ["agriculture"]
+        return ranked_results
     
-    def _build_prompt(
+    def _build_retrieval_prompt(
         self,
         message: str,
-        documents: List[Dict[str, Any]],
-        findings: List[Dict[str, Any]]
+        query_analysis: Dict[str, Any],
+        ranked_results: List[Dict[str, Any]],
+        context: Dict[str, Any] = None
     ) -> str:
         """
-        Build prompt with retrieved information.
+        Build retrieval prompt with ranked results and context.
         
         Args:
-            message: User message
-            documents: Retrieved documents
-            findings: Extracted findings
+            message: Original user message
+            query_analysis: Query analysis
+            ranked_results: Ranked Neo4j results
+            context: Conversation context
             
         Returns:
-            Formatted prompt
+            Formatted retrieval prompt
         """
-        # Format findings
-        findings_text = ""
-        if findings:
-            findings_text = "Key findings from research:\n\n"
-            for i, finding in enumerate(findings, 1):
-                findings_text += f"{i}. From '{finding['document']}' ({finding['author']}, {finding['year']}):\n"
-                findings_text += f"   {finding['findings']}\n\n"
+        # Get conversation history if available
+        history_text = ""
+        if context and context.get("history"):
+            recent_history = context["history"][-2:]  # Last 2 exchanges
+            history_text = "Recent conversation context:\n"
+            for exchange in recent_history:
+                history_text += f"User: {exchange.get('user', '')}\n"
+                history_text += f"Assistant: {exchange.get('assistant', '')}\n\n"
         
-        # Format document list
-        doc_list = ""
-        if documents:
-            doc_list = "\nRelevant documents:\n"
-            for doc in documents[:5]:
-                doc_list += f"- {doc.get('title', 'Untitled')} by {doc.get('author', 'Unknown')} ({doc.get('year', 'N/A')})\n"
+        # Format top results
+        results_text = "Top knowledge results:\n"
+        for i, result in enumerate(ranked_results[:5], 1):
+            labels = result.get("labels", [])
+            labels_str = ", ".join(labels)
+            score = result.get("relevance_score", 0)
+            
+            results_text += f"{i}. {result.get('name', 'Unknown')} ({labels_str}) - Score: {score:.2f}\n"
         
-        prompt = f"""{findings_text}{doc_list}
+        prompt = f"""{history_text}
+Current query: {message}
+Query analysis: {query_analysis.get('type')} search with entities: {query_analysis.get('entities', [])}
 
-User question: {message}
+{results_text}
 
-Based on the research findings above, provide a comprehensive answer. Include specific data points and cite the sources. If the findings don't fully answer the question, acknowledge the limitations."""
+Please provide comprehensive answer using these results:
+1. Synthesize information from multiple sources
+2. Provide proper citations for each piece of information
+3. Explain relationships between entities
+4. Include confidence levels for different information
+5. Be specific to Malawi agricultural context
+
+Generate expert-level response with proper source attribution."""
         
         return prompt
     
-    def _format_sources(self, documents: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    def _structure_retrieval_response(self, response: str, ranked_results: List[Dict[str, Any]]) -> Dict[str, Any]:
         """
-        Format documents as sources.
+        Structure retrieval response with citations and metadata.
         
         Args:
-            documents: Retrieved documents
+            response: LLM retrieval response
+            ranked_results: Original ranked results
             
         Returns:
-            Formatted sources
+            Structured retrieval information
         """
-        sources = []
-        
-        for doc in documents[:5]:
-            sources.append({
-                "type": "research_paper",
-                "title": doc.get("title", "Untitled"),
-                "author": doc.get("author", "Unknown"),
-                "year": doc.get("year", "N/A"),
-                "source": doc.get("source", "Research database"),
-                "abstract": doc.get("abstract", "")[:200] + "..." if doc.get("abstract") else ""
+        # Generate citations from ranked results
+        citations = []
+        for i, result in enumerate(ranked_results[:5], 1):
+            citations.append({
+                "source": "neo4j_knowledge_graph",
+                "entity": result.get("name", "Unknown"),
+                "type": result.get("labels", ["Unknown"])[0] if result.get("labels") else "Unknown",
+                "confidence": result.get("relevance_score", 0.5),
+                "reference": f"Result {i}"
             })
         
-        return sources
-    
-    def _calculate_confidence(
-        self,
-        documents: List[Dict[str, Any]],
-        findings: List[Dict[str, Any]]
-    ) -> float:
-        """
-        Calculate confidence score.
+        # Determine overall confidence
+        avg_confidence = sum(r.get("relevance_score", 0.5) for r in ranked_results[:5]) / len(ranked_results[:5]) if ranked_results else 0.5
         
-        Args:
-            documents: Retrieved documents
-            findings: Extracted findings
-            
-        Returns:
-            Confidence score (0-1)
-        """
-        if not documents:
-            return 0.2
+        # Extract information types
+        info_types = []
+        for result in ranked_results[:3]:
+            labels = result.get("labels", [])
+            info_types.extend(labels)
         
-        base_confidence = 0.4
-        
-        # Increase with number of documents
-        base_confidence += min(len(documents) * 0.05, 0.2)
-        
-        # Increase with successful findings extraction
-        if findings:
-            base_confidence += min(len(findings) * 0.1, 0.3)
-        
-        return min(base_confidence, 0.9)
+        return {
+            "citations": citations,
+            "confidence": min(avg_confidence + 0.2, 0.9),  # Boost confidence slightly
+            "information_types": list(set(info_types)),
+            "sources_used": len(ranked_results),
+            "ranking_quality": "high" if ranked_results and ranked_results[0].get("relevance_score", 0) > 0.7 else "medium"
+        }
