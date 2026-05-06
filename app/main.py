@@ -10,7 +10,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
-from app.graph.langgraph_flow import fda_workflow
+from app.graph.langgraph_flow import get_fda_workflow
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -60,14 +60,15 @@ app.add_middleware(
 
 @app.get("/", response_model=HealthResponse)
 async def root():
-    """Root endpoint with system info."""
+    """Root endpoint with system info - fast startup."""
     return HealthResponse(
         status="healthy",
         version="2.0.0",
         knowledge_base={
             "workflow": "LangGraph multi-agent system",
             "agents": ["crop", "disease", "weather", "knowledge", "conversation"],
-            "performance_target": "<2s initial token latency"
+            "performance_target": "<2s initial token latency",
+            "optimization": "lazy_loading_enabled"
         }
     )
 
@@ -88,21 +89,13 @@ async def health_check():
 
 @app.post("/chat", response_model=ChatResponse)
 async def chat(request: ChatRequest):
-    """
-    Main chat endpoint - uses LangGraph multi-agent system.
     
-    CRITICAL: This meets ALL Tensorview assignment requirements:
-    • LangGraph Architecture ✅
-    • 5 Specialized Agents ✅
-    • Neo4j Knowledge Graph ✅
-    • Memory Management ✅
-    • <2s Response Target ✅
-    """
     try:
         logger.info(f"Received query: {request.message}")
         
-        # Process through LangGraph workflow
-        result = await fda_workflow.process_query(request.message, request.user_id)
+        # Get lazy-loaded workflow and process query
+        workflow = get_fda_workflow()
+        result = workflow.process_query(request.message, request.user_id)
         
         return ChatResponse(
             response=result.get("response", "I apologize, but I couldn't process your request."),
