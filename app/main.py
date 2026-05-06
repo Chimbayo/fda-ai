@@ -26,13 +26,6 @@ class ChatRequest(BaseModel):
 class ChatResponse(BaseModel):
     """Chat response model."""
     response: str
-    agent_type: Optional[str] = None
-    confidence: float = 0.0
-    sources: list = []
-    reasoning: Optional[str] = None
-    response_time: Optional[float] = None
-    query_count: int = 0
-    workflow_steps: list = []
 
 
 class HealthResponse(BaseModel):
@@ -97,16 +90,8 @@ async def chat(request: ChatRequest):
         workflow = get_fda_workflow()
         result = workflow.process_query(request.message, request.user_id)
         
-        return ChatResponse(
-            response=result.get("response", "I apologize, but I couldn't process your request."),
-            agent_type=result.get("agent_type", "unknown"),
-            confidence=result.get("confidence", 0.0),
-            sources=result.get("sources", []),
-            reasoning=result.get("reasoning", "No reasoning provided"),
-            response_time=result.get("response_time", 0.0),
-            query_count=result.get("query_count", 0),
-            workflow_steps=result.get("workflow_steps", [])
-        )
+        # Return only the response content
+        return ChatResponse(response=result)
         
     except Exception as e:
         logger.error(f"Error: {e}")
