@@ -632,43 +632,15 @@ class FDAWorkflow:
             response_time = (datetime.now() - start_time).total_seconds()
             logger.info(f"Query processed in {response_time:.2f}s via {final_state.get('current_agent', 'unknown')}")
             
-            # Format response
+            # Format response - return only response content
             if final_state and final_state.get("context"):
-                return {
-                    "response": final_state["context"].get("response", "No response generated"),
-                    "agent_type": final_state.get("current_agent", "unknown"),
-                    "detected_crop": final_state.get("detected_crop", "general"),
-                    "confidence": final_state["context"].get("confidence", 0.0),
-                    "sources": final_state["context"].get("sources", []),
-                    "reasoning": final_state.get("agent_reasoning", "No reasoning provided"),
-                    "response_time": response_time,
-                    "query_count": final_state.get("query_count", 0),
-                    "workflow_steps": [f"Routed to {final_state.get('current_agent', 'unknown')} agent for {final_state.get('detected_crop', 'general')}"]
-                }
+                return final_state["context"].get("response", "No response generated")
             else:
-                return {
-                    "response": "I apologize, but I couldn't process your request.",
-                    "agent_type": "error",
-                    "confidence": 0.0,
-                    "sources": [],
-                    "reasoning": "Processing failed",
-                    "response_time": response_time,
-                    "query_count": 0,
-                    "workflow_steps": []
-                }
+                return "I apologize, but I couldn't process your request."
                 
         except Exception as e:
             logger.error(f"Processing error: {e}")
-            return {
-                "response": f"Error processing your request: {str(e)}",
-                "agent_type": "error",
-                "confidence": 0.0,
-                "sources": [],
-                "reasoning": f"System error: {str(e)}",
-                "response_time": 0.0,
-                "query_count": 0,
-                "workflow_steps": []
-            }
+            return f"Error processing your request: {str(e)}"
     
     def _get_workflow_summary(self, state: WorkflowState) -> List[str]:
         """Get summary of workflow steps taken."""
