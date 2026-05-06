@@ -113,7 +113,7 @@ class OllamaModel:
             cache_key = self._get_cache_key(prompt, system_prompt, temp)
             if cache_key in _response_cache:
                 logger.debug(f"Cache hit: {cache_key[:8]}...")
-                yield _response_cache[cache_key]
+                return _response_cache[cache_key]
         
         # Use prompt directly for now (compression disabled for stability)
         compressed_prompt = prompt
@@ -178,23 +178,25 @@ class OllamaModel:
                     timeout=aiohttp.ClientTimeout(total=self.timeout)
                 ) as response:
                     if response.status == 200:
+                        content = ""
                         async for line in response.content:
                             if line:
                                 try:
                                     import json
                                     data = json.loads(line)
                                     if "message" in data and "content" in data["message"]:
-                                        yield data["message"]["content"]
+                                        content += data["message"]["content"]
                                 except json.JSONDecodeError:
                                     continue
+                        return content
                     else:
                         error_text = await response.text()
-                        logger.error(f"Ollama streaming error: {response.status} - {error_text}")
-                        yield "Error: Unable to generate response"
+                        logger.error(f"Ollama API error: {response.status} - {error_text}")
+                        return "Error: Unable to generate response"
                         
         except Exception as e:
-            logger.error(f"Streaming error: {e}")
-            yield "Error: Connection failed"
+            logger.error(f"Connection error: {e}")
+            return "Error: Connection failed"
     
     async def list_models(self) -> list:
         """

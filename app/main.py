@@ -10,7 +10,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
-from app.graph.langgraph_flow_new import fda_workflow
+from app.graph.langgraph_flow import fda_workflow
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
