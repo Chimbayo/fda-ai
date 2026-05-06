@@ -1,0 +1,207 @@
+{
+  "expert_report": {
+    "expert_id": "MAIZE_001",
+    "specialization": "Maize Farming",
+    "source": "Key Seed Co Malawi - Expert Agricultural Knowledge",
+    "date": "2024-05-06",
+    "data": {
+      "crops": [
+        {
+          "name": "Maize",
+          "type": "Cereal",
+          "scientific_name": "Zea mays",
+          "common_diseases": ["Maize Streak Virus", "Grey Leaf Spot", "Northern Corn Leaf Blight", "Common Rust", "Ear Rot"],
+          "common_pests": ["Fall Armyworm", "Stalk Borer", "Maize Weevil", "Cutworm", "Aphids"],
+          "farming_methods": ["Land Preparation", "Planting", "Fertilizer Application", "Weed Control", "Pest Management", "Harvesting"]
+        }
+      ],
+      "varieties": [
+        {
+          "name": "SC 301 (Kalulu)",
+          "type": "Hybrid",
+          "maturity_days": 90,
+          "yield_tons_ha": "4-6",
+          "characteristics": "Ultra-early maturity, suitable for fast maturity, ideal for lowland/short season areas",
+          "altitude": "Lowland",
+          "special_features": "Fast maturing"
+        },
+        {
+          "name": "SC 419/SC 449 (Kanyani)",
+          "type": "Hybrid",
+          "maturity_days": 100,
+          "yield_tons_ha": "5-7",
+          "characteristics": "Very early maturing, closed tip, suitable for areas with shorter rainfall periods",
+          "altitude": "Lowland to Medium",
+          "special_features": "Drought tolerant"
+        },
+        {
+          "name": "SC 529/SC 537 (Mbidzi)",
+          "type": "Hybrid",
+          "maturity_days": 110,
+          "yield_tons_ha": "6-8",
+          "characteristics": "Early maturing, adaptable to various conditions",
+          "altitude": "Medium",
+          "special_features": "Adaptable"
+        },
+        {
+          "name": "SC 555 (Mbidzi)",
+          "type": "Hybrid",
+          "maturity_days": 120,
+          "yield_tons_ha": "7-9",
+          "characteristics": "Medium maturity, excellent Grey Leaf Spot and Maize Streak Virus tolerance",
+          "altitude": "Medium to High",
+          "special_features": "Disease resistant"
+        },
+        {
+          "name": "SC 627/SC 653 (Mkango)",
+          "type": "Hybrid",
+          "maturity_days": 130,
+          "yield_tons_ha": "8-10",
+          "characteristics": "Medium to late maturing, widely adaptable across different agro-ecological zones",
+          "altitude": "Medium to High",
+          "special_features": "Widely adaptable"
+        },
+        {
+          "name": "SC 719 (Njobvu)",
+          "type": "Hybrid",
+          "maturity_days": 140,
+          "yield_tons_ha": "9-12",
+          "characteristics": "High yielding, late maturing, produces big cobs, suitable for high altitude areas",
+          "altitude": "High Altitude",
+          "special_features": "High yielding"
+        },
+        {
+          "name": "SC 729",
+          "type": "Hybrid",
+          "maturity_days": 135,
+          "yield_tons_ha": "10-12",
+          "characteristics": "High-yielding hybrid, excellent heat and drought tolerance, good for both low and high altitude",
+          "altitude": "Wide Range",
+          "special_features": "Heat and drought tolerant"
+        }
+      ],
+      "farming_methods": [
+        {
+          "name": "Land Preparation",
+          "stage": "Pre-planting",
+          "description": "Prepare land properly before planting season. Use deep plowing 20-30cm and incorporate organic matter for soil fertility.",
+          "key_points": ["Deep plowing 20-30cm", "Incorporate well-rotted manure", "Test soil pH and nutrients", "Ensure good drainage"],
+          "timing": "2-3 weeks before rains"
+        },
+        {
+          "name": "Planting",
+          "stage": "Planting",
+          "description": "Plant maize at onset of rains using proper spacing and seed rate for optimal germination and growth.",
+          "key_points": ["Plant with first rains", "Spacing 75cm x 25cm", "Seed rate 25kg/ha", "Use certified seeds"],
+          "timing": "November-December (first rains)"
+        },
+        {
+          "name": "Fertilizer Application",
+          "stage": "Growing",
+          "description": "Apply fertilizers at proper growth stages for maximum yield and plant health.",
+          "key_points": ["Basal: NPK 15:15:15 at planting", "Top dress: Urea at 3-4 weeks", "Split applications for efficiency", "Consider soil test results"],
+          "timing": "At planting + 3-4 weeks after"
+        },
+        {
+          "name": "Weed Control",
+          "stage": "Growing",
+          "description": "Control weeds to reduce competition for nutrients, water, and sunlight.",
+          "key_points": ["Early weed control critical", "Hand weeding or herbicides", "Keep field weed-free first 6 weeks", "Mulching helps control weeds"],
+          "timing": "First 6-8 weeks critical"
+        },
+        {
+          "name": "Pest Management",
+          "stage": "Growing",
+          "description": "Monitor and control pests to prevent yield losses and ensure healthy crop development.",
+          "key_points": ["Regular scouting", "Control fall armyworm early", "Use recommended pesticides", "Practice integrated pest management"],
+          "timing": "Throughout growing season"
+        },
+        {
+          "name": "Harvesting",
+          "stage": "Harvest",
+          "description": "Harvest at proper maturity for maximum yield and quality.",
+          "key_points": ["Harvest when dry", "Proper drying to 13% moisture", "Store in clean dry place", "Avoid post-harvest losses"],
+          "timing": "120-140 days after planting"
+        }
+      ],
+      "diseases": [
+        {
+          "name": "Maize Streak Virus",
+          "symptoms": ["Yellow streaks on leaves", "Stunted growth", "Poor cob development", "Reduced yield"],
+          "treatments": ["Use resistant varieties", "Control leafhoppers", "Remove infected plants"],
+          "prevention": ["Plant resistant varieties like SC 555", "Vector control", "Early planting"]
+        },
+        {
+          "name": "Grey Leaf Spot",
+          "symptoms": ["Greyish lesions on leaves", "Yellowing of leaves", "Premature leaf death"],
+          "treatments": ["Fungicide application", "Resistant varieties", "Crop rotation"],
+          "prevention": ["Use SC 555 variety", "Proper spacing", "Balanced fertilization"]
+        },
+        {
+          "name": "Northern Corn Leaf Blight",
+          "symptoms": ["Greyish-green lesions", "Elliptical spots on leaves", "Leaf blighting"],
+          "treatments": ["Fungicide sprays", "Resistant varieties", "Early detection"],
+          "prevention": ["Resistant varieties", "Proper plant density", "Balanced nutrition"]
+        },
+        {
+          "name": "Common Rust",
+          "symptoms": ["Orange-brown pustules", "Yellowing of leaves", "Reduced photosynthesis"],
+          "treatments": ["Fungicide application", "Early planting", "Resistant varieties"],
+          "prevention": ["Early planting", "Resistant varieties", "Proper spacing"]
+        },
+        {
+          "name": "Ear Rot",
+          "symptoms": ["Rotting of cobs", "Fungal growth", "Bad odor", "Reduced quality"],
+          "treatments": ["Proper drying", "Fungicide treatment", "Good ventilation"],
+          "prevention": ["Timely harvesting", "Proper drying", "Good storage conditions"]
+        }
+      ],
+      "pests": [
+        {
+          "name": "Fall Armyworm",
+          "damage_symptoms": ["Defoliation", "Holes in leaves", "Damage to tassels and cobs"],
+          "control_methods": ["Early scouting", "Appropriate pesticides", "Biological control", "Cultural practices"],
+          "life_cycle": "Multiple generations, severe damage"
+        },
+        {
+          "name": "Stalk Borer",
+          "damage_symptoms": ["Holes in stalks", "Stalk breakage", "Poor ear development", "Yield loss"],
+          "control_methods": ["Early detection", "Insecticide application", "Resistant varieties", "Crop rotation"],
+          "life_cycle": "Larvae bore into stalks"
+        },
+        {
+          "name": "Maize Weevil",
+          "damage_symptoms": ["Damage to stored grain", "Weight loss", "Quality reduction", "Contamination"],
+          "control_methods": ["Proper drying", "Clean storage", "Hermetic storage", "Fumigation"],
+          "life_cycle": "Storage pest, multiple generations"
+        },
+        {
+          "name": "Cutworm",
+          "damage_symptoms": ["Cut seedlings at base", "Plant death", "Reduced stand", "Yield loss"],
+          "control_methods": ["Collars around seedlings", "Bait traps", "Soil tillage", "Early planting"],
+          "life_cycle": "Soil-dwelling, night active"
+        },
+        {
+          "name": "Aphids",
+          "damage_symptoms": ["Yellowing of leaves", "Stunted growth", "Honeydew secretion", "Sooty mold"],
+          "control_methods": ["Insecticidal soap", "Natural enemies", "Resistant varieties", "Early detection"],
+          "life_cycle": "Multiple generations, rapid reproduction"
+        }
+      ],
+      "regional_adaptations": {
+        "malawi_climate": {
+          "planting_season": "November-December (onset of rains)",
+          "temperature_range": "15-30°C optimal",
+          "rainfall_requirements": "600-900mm annually",
+          "soil_type": "Well-drained loamy soils, pH 5.5-7.0",
+          "challenges": ["Drought stress", "Pest pressure", "Disease outbreaks", "Climate variability"]
+        },
+        "altitude_zones": {
+          "lowland": "SC 301, SC 419/449 varieties",
+          "medium": "SC 529/537, SC 555, SC 627/653 varieties", 
+          "high_altitude": "SC 719, SC 729 varieties"
+        }
+      }
+    }
+  }
+}

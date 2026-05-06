@@ -38,6 +38,13 @@ class JSONKnowledgeLoader:
                     self.knowledge_cache['cabbage'] = json.load(f)
                 logger.info("✅ Loaded cabbage expert knowledge")
             
+            # Load maize knowledge
+            maize_file = self.data_dir / "maize_expert_knowledge.json"
+            if maize_file.exists():
+                with open(maize_file, 'r', encoding='utf-8') as f:
+                    self.knowledge_cache['maize'] = json.load(f)
+                logger.info("✅ Loaded maize expert knowledge")
+            
             # Load sample knowledge
             sample_file = self.data_dir / "sample_knowledge.json"
             if sample_file.exists():
@@ -56,10 +63,10 @@ class JSONKnowledgeLoader:
             data = self.knowledge_cache[crop_lower].get('expert_report', {}).get('data', {})
             
             # Try different data structures
-            if 'crops' in data and data['crops']:
-                raw_varieties = data['crops'][0].get('varieties', [])
-            elif 'varieties' in data:
+            if 'varieties' in data:
                 raw_varieties = data['varieties']
+            elif 'crops' in data and data['crops']:
+                raw_varieties = data['crops'][0].get('varieties', [])
             else:
                 raw_varieties = []
             
@@ -69,11 +76,10 @@ class JSONKnowledgeLoader:
                 name = var.get('name', '').strip()
                 if (name and 
                     len(name) > 5 and 
-                    not any(skip in name.lower() for skip in ['choosing', 'there are', 'so choosing', 'fresh ma', 'season and', 'means the', 'tomato']) and
+                    not any(skip in name.lower() for skip in ['choosing', 'there are', 'so choosing', 'season and', 'means', 'tomato']) and
                     not name.startswith('or ') and
                     'variety' not in name.lower() and
-                    name.count(' ') < 3 and  # Limit to 2 words max
-                    name[0].isupper()):  # Start with capital letter
+                    name.count(' ') < 6):  # Limit words for maize (SC names have spaces)
                     clean_varieties.append(var)
             
             # If no good varieties found for tomato, use fallback
@@ -240,4 +246,10 @@ def get_json_knowledge_loader() -> JSONKnowledgeLoader:
     global _json_loader
     if _json_loader is None:
         _json_loader = JSONKnowledgeLoader()
+    return _json_loader
+
+def reload_json_knowledge_loader() -> JSONKnowledgeLoader:
+    """Force reload JSON knowledge loader with new files."""
+    global _json_loader
+    _json_loader = JSONKnowledgeLoader()
     return _json_loader

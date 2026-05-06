@@ -173,9 +173,14 @@ class FDAWorkflow:
             # Get crop-specific sources
             sources = crop_knowledge_bases.get(detected_crop, ["general_crop_knowledge_base"])
             
-            # Use JSON expert knowledge for responses
+            # Use JSON expert knowledge and PDF knowledge for responses
             try:
-                knowledge_loader = _lazy_import_knowledge()()
+                # Force reload knowledge to get latest data including new maize file
+                from app.knowledge.json_knowledge_loader import JSONKnowledgeLoader
+                from app.knowledge.pdf_knowledge_retriever import get_pdf_knowledge_retriever
+                
+                knowledge_loader = JSONKnowledgeLoader()  # Create fresh instance
+                pdf_retriever = get_pdf_knowledge_retriever()
                 
                 if detected_crop in knowledge_loader.knowledge_cache:
                     # Get expert knowledge from JSON files
@@ -186,7 +191,7 @@ class FDAWorkflow:
                             variety_names = []
                             for var in varieties[:5]:  # Top 5 varieties
                                 name = var.get('name', '').strip()
-                                if name and len(name) > 3:  # Filter out garbage entries
+                                if name:  # Varieties already filtered in get_crop_varieties
                                     maturity = var.get('maturity_days', '')
                                     yield_info = var.get('yield_tons_ha', '')
                                     characteristics = var.get('characteristics', '')
@@ -203,6 +208,15 @@ class FDAWorkflow:
                             
                             if variety_names:
                                 response = f"Based on expert knowledge for {detected_crop.title()} in Malawi, recommended varieties include:\n" + "\n".join(f"• {v}" for v in variety_names)
+                                
+                                # Add PDF knowledge if available
+                                if pdf_retriever.is_available():
+                                    pdf_results = pdf_retriever.get_crop_specific_knowledge(detected_crop, f"{detected_crop} varieties farming practices")
+                                    if pdf_results:
+                                        response += f"\n\n📚 **Additional Knowledge from Agricultural Guides:**\n"
+                                        for result in pdf_results[:2]:  # Top 2 PDF results
+                                            pdf_text = result['text'][:200] + "..." if len(result['text']) > 200 else result['text']
+                                            response += f"• From {result['source']}: {pdf_text}\n"
                             else:
                                 response = f"I found expert knowledge for {detected_crop.title()}, but variety information needs to be updated. Please consult local agricultural extension for current variety recommendations."
                         else:
