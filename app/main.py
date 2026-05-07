@@ -58,27 +58,11 @@ async def root():
         status="healthy",
         version="2.0.0",
         knowledge_base={
-            "workflow": "LangGraph multi-agent system",
-            "agents": ["crop", "disease", "weather", "knowledge", "conversation"],
-            "performance_target": "<2s initial token latency",
-            "optimization": "lazy_loading_enabled"
+            
+            "agents": ["crop", "disease", "weather", "knowledge", "conversation"]
+        
         }
     )
-
-
-@app.get("/health")
-async def health_check():
-    """Health check endpoint."""
-    return {
-        "status": "healthy",
-        "workflow": "LangGraph multi-agent",
-        "agents_active": 5,
-        "neo4j_connected": True,
-        "ollama_model": "gemma:4b",
-        "response_cache": True,
-        "memory_enabled": True
-    }
-
 
 @app.post("/chat", response_model=ChatResponse)
 async def chat(request: ChatRequest):
@@ -97,35 +81,6 @@ async def chat(request: ChatRequest):
         logger.error(f"Error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
-
-@app.get("/workflow-stats")
-async def workflow_stats():
-    """Get workflow performance statistics."""
-    return {
-        "workflow_type": "LangGraph multi-agent",
-        "agents_available": 5,
-        "routing_method": "Keyword + LLM-based",
-        "memory_type": "Neo4j + ConversationMemory",
-        "performance_target": "<2s initial token",
-        "optimization_features": [
-            "Agent specialization",
-            "Intelligent routing", 
-            "Knowledge graph reasoning",
-            "Conversation memory",
-            "Response caching",
-            "Streaming responses"
-        ]
-    }
-
-
-@app.post("/reload-workflow")
-async def reload_workflow():
-    """Reload LangGraph workflow configuration."""
-    # This would reload agent configurations and knowledge
-    return {
-        "message": "Workflow reloaded successfully",
-        "timestamp": datetime.now().isoformat()
-    }
 
 
 if __name__ == "__main__":
