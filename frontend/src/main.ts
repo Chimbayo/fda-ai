@@ -66,23 +66,37 @@ class FDAChatBot {
     const message = this.messageInput.value.trim();
     if (!message) return;
 
+    // Add user message first
     this.addMessageToChat({ content: message, sender: 'user', timestamp: new Date() });
     this.messageInput.value = '';
     this.setLoading(true);
 
     try {
+      console.log('Sending message to API:', message);
       const response = await this.callChatAPI(message);
+      console.log('API response:', response);
       this.addMessageToChat({ content: response, sender: 'bot', timestamp: new Date() });
       this.saveChatHistory();
     } catch (error) {
       console.error('Error sending message:', error);
+      const errorMessage = this.getDetailedErrorMessage(error);
       this.addMessageToChat({ 
-        content: 'Sorry, I encountered an error. Please try again.', 
+        content: errorMessage, 
         sender: 'bot', 
         timestamp: new Date() 
       });
     } finally {
       this.setLoading(false);
+    }
+  }
+
+  private getDetailedErrorMessage(error: any): string {
+    if (error instanceof TypeError && error.message.includes('fetch')) {
+      return 'Cannot connect to the server. Please make sure the backend is running on http://localhost:8000';
+    } else if (error instanceof Error && error.message.includes('HTTP error')) {
+      return `Server error: ${error.message}. Please try again later.`;
+    } else {
+      return `Error: ${error.message || 'Unknown error occurred'}. Please try again.`;
     }
   }
 
