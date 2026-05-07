@@ -494,7 +494,14 @@ class FDAWorkflow:
             query = state["messages"][-1] if state["messages"] else ""
             
             # Simple conversation response without async for now
-            response = f"Hello! I'm your agricultural assistant for Malawi farmers. I can help you with crops, diseases, weather, and farming advice. You asked about: {query}"
+            if any(greeting in query_lower for greeting in ["hello", "hi", "hey"]):
+                response = "Hello! I'm your agricultural assistant for Malawi farmers. How can I help you today?"
+            elif any(greeting in query_lower for greeting in ["thanks", "thank", "appreciate"]):
+                response = "You're welcome! I'm here to help with any agricultural questions you have."
+            elif "help" in query_lower:
+                response = "I'm your agricultural assistant for Malawi farmers. I can help you with crop varieties, disease diagnosis, weather advice, and farming practices. What specific topic would you like assistance with?"
+            else:
+                response = f"Hello! I'm your agricultural assistant for Malawi farmers. I can help you with crops, diseases, weather, and farming advice. How can I assist you today?"
             
             # Return state as dictionary
             updated_state = {

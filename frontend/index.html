@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FDA-AI Agricultural Assistant</title>
+    <link rel="stylesheet" href="src/styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Left Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <img src="./assets/logo.svg" alt="FDA-AI Logo" class="logo" onerror="this.style.display='none'; console.error('Logo failed to load');">
+                <h2>FDA-CHATBOT</h2>
+            </div>
+            
+            <div class="chat-history" id="chat-history">
+                <h3>Chat History</h3>
+                <div class="history-list" id="history-list">
+                    <!-- Chat history items will be displayed here -->
+                </div>
+            </div>
+            
+            <div class="sidebar-footer">
+                <button class="new-chat-btn" id="new-chat-btn">New Chat</button>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="header">
+                <h1>Farmers Digital Assistant</h1>
+                <p>Expert farming advice for Malawi farmers</p>
+            </div>
+            
+            <div class="chat-container" id="chat-container">
+                <!-- Messages will be displayed here -->
+            </div>
+            
+            <div class="input-container">
+                <input 
+                    type="text" 
+                    id="message-input" 
+                    class="message-input" 
+                    placeholder="Ask about crops, diseases, weather, or farming practices..."
+                    autocomplete="off"
+                />
+                <button id="send-button" class="send-button">
+                    Send
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <script type="module" src="src/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,15 @@
+<svg width="50" height="50" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
+  <!-- Agricultural themed logo -->
+  <circle cx="25" cy="25" r="24" fill="#2E7D32" stroke="#1B5E20" stroke-width="2"/>
+  
+  <!-- Maize/corn icon -->
+  <path d="M20 15 Q25 10, 30 15 L30 35 Q25 40, 20 35 Z" fill="#FFEB3B"/>
+  <path d="M22 18 L28 18 L28 32 Q25 35, 22 32 Z" fill="#FFC107"/>
+  
+  <!-- Leaves -->
+  <path d="M15 20 Q10 25, 15 30" fill="none" stroke="#4CAF50" stroke-width="2"/>
+  <path d="M35 20 Q40 25, 35 30" fill="none" stroke="#4CAF50" stroke-width="2"/>
+  
+  <!-- FDA text -->
+  <text x="25" y="45" font-family="Arial, sans-serif" font-size="8" font-weight="bold" text-anchor="middle" fill="#1B5E20">FDA-AI</text>
+</svg>
