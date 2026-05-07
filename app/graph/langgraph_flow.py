@@ -492,6 +492,7 @@ class FDAWorkflow:
         """Conversation agent node."""
         try:
             query = state["messages"][-1] if state["messages"] else ""
+            query_lower = query.lower()
             
             # Simple conversation response without async for now
             if any(greeting in query_lower for greeting in ["hello", "hi", "hey"]):

@@ -143,6 +143,8 @@ class FDAChatBot {
   }
 
   private renderMessages(): void {
+    if (!this.chatContainer) return;
+    
     this.chatContainer.innerHTML = '';
     
     this.messages.forEach(message => {
@@ -155,14 +157,7 @@ class FDAChatBot {
       if (message.sender === 'bot') {
         contentElement.innerHTML = this.formatBotMessage(message.content);
       } else {
-        const inputElement = document.createElement('input');
-        inputElement.type = 'text';
-        inputElement.id = 'message-input';
-        inputElement.className = 'message-input';
-        inputElement.placeholder = 'Ask about crops, diseases, weather, or farming practices...';
-        inputElement.autocomplete = 'off';
-        inputElement.accept = 'on';
-        contentElement.appendChild(inputElement);
+        contentElement.textContent = message.content;
       }
       
       messageElement.appendChild(contentElement);
