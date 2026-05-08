@@ -1,0 +1,19 @@
+[33m4775c94[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmaster[m[33m, [m[1;31morigin/master[m[33m, [m[1;31morigin/HEAD[m[33m)[m fixed duplicate message issue
+[33m9ade62f[m fixed color consistency issue
+[33ma7ea872[m fixed scrollbar issues
+[33me4b4e83[m User Message Display Issue Fixed
+[33m8d7ebef[m fixed chat functionality
+[33m547845f[m added frontend
+[33m20a0120[m deleted endpoints
+[33m08710b2[m Simplified ChatResponse Model
+[33m726aa6d[m Removed Metadata fields
+[33m2397600[m changes
+[33m3f747ae[m integrated knowledge files
+[33m51040ae[m resolved server startup issues
+[33m3cb5f22[m update
+[33mfd16139[m fixed async/await issues in RAG system for 4-second response times
+[33medd2bf6[m added tomato knowledge base from PDFs with extraction and ingestion scripts
+[33m314e717[m update
+[33m7c16b7e[m Enhanced cabbage knowledge base
+[33mcea0a6f[m added cabbage  expert's knowledge
+[33m8e55ab8[m Clear repo
