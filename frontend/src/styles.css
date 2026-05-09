@@ -76,8 +76,7 @@ body {
   transition: background 0.2s;
   border-left: 3px solid transparent;
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column;
   min-width: 0;
   flex-shrink: 0;
 }
@@ -96,6 +95,9 @@ body {
   font-weight: 600;
   margin-bottom: 5px;
   font-size: 0.9rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .history-item-preview {
@@ -128,6 +130,7 @@ body {
   opacity: 0;
   transition: opacity 0.2s, background 0.2s;
   margin-left: 8px;
+  margin-top: 0;
 }
 
 .history-item:hover .delete-btn {

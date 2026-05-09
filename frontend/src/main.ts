@@ -267,6 +267,16 @@ class FDAChatBot {
       title.className = 'history-item-title';
       title.textContent = `Chat ${this.chatSessions.length - index}`;
       
+      const deleteBtn = document.createElement('button');
+      deleteBtn.className = 'delete-btn';
+      deleteBtn.textContent = 'Delete';
+      deleteBtn.addEventListener('click', (e) => {
+        e.stopPropagation(); // Prevent loading session
+        this.deleteSession(session.id);
+      });
+      
+      title.appendChild(deleteBtn);
+      
       const preview = document.createElement('div');
       preview.className = 'history-item-preview';
       if (session.messages && session.messages.length > 0) {
@@ -293,17 +303,7 @@ class FDAChatBot {
       content.appendChild(preview);
       content.appendChild(time);
       
-      // Add delete button
-      const deleteBtn = document.createElement('button');
-      deleteBtn.className = 'delete-btn';
-      deleteBtn.textContent = 'Delete';
-      deleteBtn.addEventListener('click', (e) => {
-        e.stopPropagation(); // Prevent loading the session
-        this.deleteSession(session.id);
-      });
-      
       historyItem.appendChild(content);
-      historyItem.appendChild(deleteBtn);
       
       historyItem.addEventListener('click', () => {
         this.loadSession(session.id);
