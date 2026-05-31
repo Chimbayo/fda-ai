@@ -2,17 +2,5 @@
   "version": 2,
   "buildCommand": "cd frontend && npm install && npm run build",
   "outputDirectory": "frontend/dist",
-  "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "/app/main.py"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/frontend/dist/$1"
-    }
-  ],
-  "env": {
-    "PYTHON_VERSION": "3.11"
-  }
+  "installCommand": "cd frontend && npm install"
 }
