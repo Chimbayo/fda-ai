@@ -101,7 +101,11 @@ class FDAChatBot {
   }
 
   private async callChatAPI(message: string): Promise<string> {
-    const response = await fetch('http://localhost:8000/chat', {
+    const apiUrl = process.env.NODE_ENV === 'production' 
+      ? '/api/chat' 
+      : 'http://localhost:8000/chat';
+    
+    const response = await fetch(apiUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
