@@ -2,16 +2,16 @@
   "name": "fda-ai-frontend",
   "version": "1.0.0",
   "description": "Frontend for FDA-AI Agricultural Assistant",
+  "private": true,
   "main": "index.html",
   "scripts": {
     "dev": "vite",
-    "build": "node ./node_modules/vite/bin/vite.js build",
+    "build": "vite build",
     "preview": "vite preview"
   },
-  "dependencies": {
-    "vite": "^8.0.14"
-  },
+  "dependencies": {},
   "devDependencies": {
+    "vite": "^8.0.14",
     "@types/node": "^20.0.0",
     "typescript": "^6.0.3"
   }
