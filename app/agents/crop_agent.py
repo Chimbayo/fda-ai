@@ -4,8 +4,10 @@ Provides Malawi-specific crop recommendations with Neo4j knowledge integration.
 """
 from typing import Dict, Any, List
 import logging
+import os
 
 from app.models.ollama_model import OllamaModel
+from app.models.openai_model import OpenAIModel
 from app.database.neo4j_client import Neo4jClient
 
 logger = logging.getLogger(__name__)
@@ -18,7 +20,13 @@ class CropAgent:
     """
     
     def __init__(self):
-        self.llm = OllamaModel()
+        # Use OpenAI if API key is available, otherwise fall back to Ollama
+        if os.getenv("OPENAI_API_KEY"):
+            self.llm = OpenAIModel()
+            logger.info("CropAgent using OpenAI model")
+        else:
+            self.llm = OllamaModel()
+            logger.info("CropAgent using Ollama model")
         self.neo4j = Neo4jClient()
         
         # Crop advisory system prompt

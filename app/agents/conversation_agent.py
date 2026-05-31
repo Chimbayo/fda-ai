@@ -4,8 +4,10 @@ Provides friendly interaction and clarifies user intent.
 """
 from typing import Dict, Any, List
 import logging
+import os
 
 from app.models.ollama_model import OllamaModel
+from app.models.openai_model import OpenAIModel
 
 logger = logging.getLogger(__name__)
 
@@ -18,7 +20,13 @@ class ConversationAgent:
     """
     
     def __init__(self):
-        self.llm = OllamaModel()
+        # Use OpenAI if API key is available, otherwise fall back to Ollama
+        if os.getenv("OPENAI_API_KEY"):
+            self.llm = OpenAIModel()
+            logger.info("ConversationAgent using OpenAI model")
+        else:
+            self.llm = OllamaModel()
+            logger.info("ConversationAgent using Ollama model")
         
         # System prompt for friendly conversation
         self.system_prompt = """You are a friendly and helpful agricultural assistant for farmers in Malawi.

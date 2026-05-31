@@ -4,8 +4,10 @@ Provides expert-level disease analysis with reasoning and recommendations.
 """
 from typing import Dict, Any, List
 import logging
+import os
 
 from app.models.ollama_model import OllamaModel
+from app.models.openai_model import OpenAIModel
 
 logger = logging.getLogger(__name__)
 
@@ -17,7 +19,13 @@ class DiseaseAgent:
     """
     
     def __init__(self):
-        self.llm = OllamaModel()
+        # Use OpenAI if API key is available, otherwise fall back to Ollama
+        if os.getenv("OPENAI_API_KEY"):
+            self.llm = OpenAIModel()
+            logger.info("DiseaseAgent using OpenAI model")
+        else:
+            self.llm = OllamaModel()
+            logger.info("DiseaseAgent using Ollama model")
         
         # Disease diagnosis system prompt
         self.system_prompt = """You are an expert agricultural pathologist specializing in crop diseases in Malawi.

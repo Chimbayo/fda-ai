@@ -47,6 +47,25 @@ class OllamaConfig:
 
 
 @dataclass
+class OpenAIConfig:
+    """OpenAI LLM configuration - Serverless-compatible."""
+    api_key: str = ""
+    model: str = "gpt-3.5-turbo"
+    temperature: float = 0.7
+    max_tokens: int = 500
+    
+    @classmethod
+    def from_env(cls) -> "OpenAIConfig":
+        """Load configuration from environment variables."""
+        return cls(
+            api_key=os.getenv("OPENAI_API_KEY", ""),
+            model=os.getenv("OPENAI_MODEL", "gpt-3.5-turbo"),
+            temperature=float(os.getenv("OPENAI_TEMPERATURE", "0.7")),
+            max_tokens=int(os.getenv("OPENAI_MAX_TOKENS", "500"))
+        )
+
+
+@dataclass
 class AppConfig:
     """Application configuration."""
     debug: bool = False
@@ -68,4 +87,5 @@ class AppConfig:
 # Global configuration instances
 neo4j_config = Neo4jConfig.from_env()
 ollama_config = OllamaConfig.from_env()
+openai_config = OpenAIConfig.from_env()
 app_config = AppConfig.from_env()

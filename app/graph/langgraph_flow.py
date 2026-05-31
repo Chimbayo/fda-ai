@@ -22,8 +22,9 @@ def _lazy_import_agents():
 def _lazy_import_services():
     from app.database.neo4j_client import Neo4jClient
     from app.models.ollama_model import OllamaModel
+    from app.models.openai_model import OpenAIModel
     from app.memory.memory_store import ConversationMemory
-    return Neo4jClient, OllamaModel, ConversationMemory
+    return Neo4jClient, OllamaModel, OpenAIModel, ConversationMemory
 
 def _lazy_import_knowledge():
     from app.knowledge.json_knowledge_loader import get_json_knowledge_loader

@@ -5,8 +5,10 @@ Determines which agent should handle a given query.
 from enum import Enum
 from typing import Dict, Any, List
 import logging
+import os
 
 from app.models.ollama_model import OllamaModel
+from app.models.openai_model import OpenAIModel
 
 logger = logging.getLogger(__name__)
 
@@ -27,7 +29,13 @@ class AgentRouter:
     """
     
     def __init__(self):
-        self.llm = OllamaModel()
+        # Use OpenAI if API key is available, otherwise fall back to Ollama
+        if os.getenv("OPENAI_API_KEY"):
+            self.llm = OpenAIModel()
+            logger.info("Using OpenAI model for routing")
+        else:
+            self.llm = OllamaModel()
+            logger.info("Using Ollama model for routing")
         
         # Keyword-based routing patterns
         self.keywords = {
