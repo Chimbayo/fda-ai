@@ -6,7 +6,7 @@ starlette==0.27.0
 
 # LangGraph for workflow orchestration
 langgraph==0.0.40
-langchain-core==0.1.0
+langchain-core>=0.1.46,<0.2.0
 
 # Neo4j database
 neo4j==5.15.0
