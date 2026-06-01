@@ -6,9 +6,9 @@ import asyncio
 import logging
 from pathlib import Path
 
-from app.database.neo4j_client import Neo4jClient
-from app.database.ingestion import KnowledgeIngestion
-from app.models.ollama_model import OllamaModel
+from api.database.neo4j_client import Neo4jClient
+from api.database.ingestion import KnowledgeIngestion
+from api.models.ollama_model import OllamaModel
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
