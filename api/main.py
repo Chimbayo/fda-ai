@@ -96,6 +96,51 @@ async def api_chat(request: ChatRequest):
         logger.error(f"Error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
+@app.get("/debug/knowledge")
+async def debug_knowledge():
+    """Debug endpoint to check what knowledge is loaded."""
+    try:
+        from api.knowledge.json_knowledge_loader import get_json_knowledge
+        from api.knowledge.pdf_knowledge_retriever import get_pdf_retriever
+        
+        json_knowledge = get_json_knowledge()
+        pdf_retriever = get_pdf_retriever()
+        
+        return {
+            "json_knowledge_loaded": len(json_knowledge) if json_knowledge else 0,
+            "pdf_retriever_ready": pdf_retriever is not None,
+            "status": "ok"
+        }
+    except Exception as e:
+        return {"error": str(e), "status": "failed"}
+
+@app.post("/ask-with-knowledge")
+async def ask_with_knowledge(request: ChatRequest):
+    """Force use of knowledge base for answers."""
+    try:
+        from api.knowledge.json_knowledge_loader import search_json_knowledge
+        from api.knowledge.pdf_knowledge_retriever import search_pdfs
+        
+        # Search both knowledge sources
+        json_results = search_json_knowledge(request.message)
+        pdf_results = search_pdfs(request.message)
+        
+        combined_knowledge = json_results + pdf_results
+        
+        if combined_knowledge:
+            # Use the knowledge to answer
+            context = "\n".join(combined_knowledge[:3])
+            answer = f"Based on our agricultural guides:\n\n{context}"
+            return ChatResponse(response=answer)
+        else:
+            # Fall back to normal flow
+            workflow = get_fda_workflow()
+            result = workflow.process_query(request.message, request.user_id)
+            return ChatResponse(response=result)
+            
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 if __name__ == "__main__":
     import uvicorn
