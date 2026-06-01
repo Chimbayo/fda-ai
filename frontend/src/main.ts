@@ -102,15 +102,15 @@ class FDAChatBot {
 
   private async callChatAPI(message: string): Promise<string> {
     const apiUrl = process.env.NODE_ENV === 'production' 
-      ? '/api/chat' 
+      ? '/chat/'           // ← Changed from '/api/chat' to '/chat/'
       : 'http://localhost:8000/chat';
     
     const response = await fetch(apiUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-      'Accept': 'application/json',
-      'User-Agent': 'FDA-AI Frontend/1.0.0'
+        'Accept': 'application/json',
+        'User-Agent': 'FDA-AI Frontend/1.0.0'
       },
       body: JSON.stringify({
         message: message,
@@ -124,7 +124,7 @@ class FDAChatBot {
 
     const data = await response.json();
     return data.response;
-  }
+}
 
   private addMessageToChat(messageData: Omit<ChatMessage, 'id'>): void {
     const message: ChatMessage = {
