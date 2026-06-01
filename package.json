@@ -1,9 +1,7 @@
-
 {
   "name": "fda-ai",
   "version": "1.0.0",
   "scripts": {
-    "dev": "concurrently \"cd frontend && npm run dev\" \"uvicorn api.main:app --reload --port 8000\"",
-    "build": "npm install --prefix frontend && npm run build --prefix frontend"
+    "dev": "concurrently \"cd frontend && npm run dev\" \"uvicorn api.main:app --reload --port 8000\""
   }
 }
