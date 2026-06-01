@@ -101,31 +101,27 @@ class FDAChatBot {
   }
 
   private async callChatAPI(message: string): Promise<string> {
-    const apiUrl = process.env.NODE_ENV === 'production' 
-      ? '/chat/'           // ← Changed from '/api/chat' to '/chat/'
-      : 'http://localhost:8000/chat';
+    const apiUrl = '/api/chat/';
     
     const response = await fetch(apiUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        'User-Agent': 'FDA-AI Frontend/1.0.0'
-      },
-      body: JSON.stringify({
-        message: message,
-        user_id: 'frontend_user'
-      })
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+            message: message,
+            user_id: 'frontend_user'
+        })
     });
 
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+        throw new Error(`HTTP error! status: ${response.status}`);
     }
 
     const data = await response.json();
     return data.response;
 }
-
   private addMessageToChat(messageData: Omit<ChatMessage, 'id'>): void {
     const message: ChatMessage = {
       ...messageData,

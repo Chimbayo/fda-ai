@@ -10,7 +10,6 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
-# CHANGE THIS ONE LINE: from app.graph → from api.graph
 from api.graph.langgraph_flow import get_fda_workflow
 
 # Configure logging
@@ -39,7 +38,7 @@ class HealthResponse(BaseModel):
 # Create FastAPI app
 app = FastAPI(
     title="FDA-AI Agricultural Assistant",
-    redirect_slashes=False  # ← GOOD! Keep this
+    redirect_slashes=False
 )
 
 # Add CORS middleware
@@ -62,6 +61,7 @@ async def root():
         }
     )
 
+
 @app.post("/chat", include_in_schema=False)
 @app.post("/chat/", response_model=ChatResponse)
 async def chat(request: ChatRequest):
@@ -69,11 +69,27 @@ async def chat(request: ChatRequest):
     try:
         logger.info(f"Received query: {request.message}")
         
-        # Get lazy-loaded workflow and process query
         workflow = get_fda_workflow()
         result = workflow.process_query(request.message, request.user_id)
         
-        # Return only the response content
+        return ChatResponse(response=result)
+        
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# NEW ENDPOINT FOR VERCEL - with /api prefix
+@app.post("/api/chat", include_in_schema=False)
+@app.post("/api/chat/", response_model=ChatResponse)
+async def api_chat(request: ChatRequest):
+    """Chat endpoint with /api prefix for Vercel compatibility."""
+    try:
+        logger.info(f"Received query (via /api/chat): {request.message}")
+        
+        workflow = get_fda_workflow()
+        result = workflow.process_query(request.message, request.user_id)
+        
         return ChatResponse(response=result)
         
     except Exception as e:
